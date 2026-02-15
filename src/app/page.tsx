@@ -66,6 +66,18 @@ export default async function Dashboard() {
       lateAmount = Number(row.total_amount) || 0
     }
   })
+let totalTransactionsAmount = validatedAmount + lateAmount
+
+const lateRate =
+  totalTransactionsAmount > 0
+    ? ((lateAmount / totalTransactionsAmount) * 100).toFixed(1)
+    : "0.0"
+
+const validatedRate =
+  totalTransactionsAmount > 0
+    ? ((validatedAmount / totalTransactionsAmount) * 100).toFixed(1)
+    : "0.0"
+
 
   // =========================
   // RENDER
@@ -79,7 +91,7 @@ export default async function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Total entreprises</CardTitle>
+<CardTitle>Total entreprises détectées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
@@ -109,9 +121,14 @@ export default async function Dashboard() {
             <CardTitle>Paiements en retard</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-red-600">
-              {lateAmount.toLocaleString()} €
-            </div>
+<div className="flex items-baseline gap-3">
+  <span className="text-3xl font-semibold text-red-600">
+    {lateAmount.toLocaleString()} €
+  </span>
+  <span className="text-sm text-muted-foreground">
+    ({lateRate}%)
+  </span>
+</div>
           </CardContent>
         </Card>
 
@@ -120,9 +137,14 @@ export default async function Dashboard() {
             <CardTitle>Paiements collectés</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-green-600">
-              {validatedAmount.toLocaleString()} €
-            </div>
+<div className="flex items-baseline gap-3">
+  <span className="text-3xl font-semibold text-green-600">
+    {validatedAmount.toLocaleString()} €
+  </span>
+  <span className="text-sm text-muted-foreground">
+    ({validatedRate}%)
+  </span>
+</div>
           </CardContent>
         </Card>
 
