@@ -39,8 +39,8 @@ const mapPoints =
         !isNaN(Number(c.latitude)) &&
         !isNaN(Number(c.longitude))
     )
-    .map((c) => ({
-      id: `${c.latitude}-${c.longitude}`,
+    .map((c, index) => ({
+      id: `${c.latitude}-${c.longitude}-${index}`,
       lat: Number(c.latitude),
       lng: Number(c.longitude),
     })) || []
@@ -126,6 +126,131 @@ const {
     console.log("LATEST TX ERROR =", latestError)
   }
   console.log("LATEST TX RAW =", JSON.stringify(latestTransactions?.[0], null, 2))
+
+  // =========================
+  // TOP DEBITEURS
+  // =========================
+
+const { data: lateTransactions } = await supabase
+  .from("transactions")
+.select(`
+  amount,
+  due_date,
+  company_id,
+  director_id,
+  companies:company_id (
+    company_name
+  ),
+  directors:director_id (
+    first_name,
+    last_name
+  )
+`)
+  .eq("status", "late")
+  .not("director_id", "is", null)
+
+const debtorMap: Record<
+  string,
+  {
+    directorName: string
+    total: number
+    companies: Set<string>
+    oldestDueDate: string | null
+  }
+> = {}
+
+lateTransactions?.forEach((tx: any) => {
+  const directorId = tx.director_id ?? "unknown"
+  const directorName = tx.directors
+    ? `${tx.directors.first_name} ${tx.directors.last_name}`
+    : "Unknown"
+
+  if (!debtorMap[directorId]) {
+    debtorMap[directorId] = {
+      directorName,
+      total: 0,
+      companies: new Set(),
+      oldestDueDate: tx.due_date,
+    }
+  }
+
+  debtorMap[directorId].total += Number(tx.amount)
+
+  if (tx.companies?.company_name) {
+    debtorMap[directorId].companies.add(tx.companies.company_name)
+  }
+
+  if (
+    tx.due_date &&
+    (!debtorMap[directorId].oldestDueDate ||
+      tx.due_date < debtorMap[directorId].oldestDueDate)
+  ) {
+    debtorMap[directorId].oldestDueDate = tx.due_date
+  }
+})
+
+const sortedDebtors = Object.entries(debtorMap)
+  .map(([id, data]) => ({
+    id,
+    ...data,
+    companies: Array.from(data.companies),
+  }))
+  .sort((a, b) => b.total - a.total)
+  .slice(0, 5)
+
+    // =========================
+  // TOP COLLECTOR
+  // =========================
+
+  const { data: collectedTx } = await supabase
+  .from("transactions")
+  .select(`
+    amount,
+    status,
+    collected_by,
+    agents (
+      id_agents,
+      first_name,
+      last_name,
+      organization
+    )
+  `)
+  .eq("status", "validated")
+
+  const collectorMap: Record<
+  string,
+  {
+    name: string
+    organization: string
+    total: number
+    count: number
+  }
+> = {}
+
+collectedTx?.forEach((tx: any) => {
+  if (!tx.agents) return
+
+  const id = tx.agents.id_agents
+  const name = `${tx.agents.first_name} ${tx.agents.last_name}`
+  const org = tx.agents.organization ?? ""
+
+  if (!collectorMap[id]) {
+    collectorMap[id] = {
+      name,
+      organization: org,
+      total: 0,
+      count: 0,
+    }
+  }
+
+  collectorMap[id].total += Number(tx.amount)
+  collectorMap[id].count += 1
+})
+
+const topCollectors = Object.entries(collectorMap)
+  .map(([id, data]) => ({ id, ...data }))
+  .sort((a, b) => b.total - a.total)
+  .slice(0, 5)
 
   // =========================
   // RENDER
@@ -247,6 +372,92 @@ const {
     <ArrowRight size={18} />
   </Link>
 </div>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+</div>
+<div className="grid grid-cols-4 gap-6">
+
+  {/* TOP DEBITEURS */}
+  <Card className="col-span-2">
+    <CardHeader>
+      <CardTitle>Top débiteurs</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      {sortedDebtors.map((debtor) => (
+        <div
+          key={debtor.id}
+          className="flex justify-between items-start border-b pb-3"
+        >
+          <div className="space-y-1">
+            <div className="font-semibold">
+              {debtor.directorName}
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {debtor.companies.join(", ")}
+            </div>
+
+            <div className="text-xs text-red-600">
+              En retard depuis le : {debtor.oldestDueDate}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-red-600 font-semibold">
+              {debtor.total.toLocaleString()} €
+            </div>
+
+            <Link
+              href={`/directors/${debtor.id}`}
+              className="text-muted-foreground hover:text-black transition"
+            >
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+
+  {/* TOP COLLECTEURS */}
+  <Card className="col-span-2">
+    <CardHeader>
+      <CardTitle>Top collecteurs</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      {topCollectors.map((collector) => (
+        <div
+          key={collector.id}
+          className="flex justify-between items-start border-b pb-3"
+        >
+          <div className="space-y-1">
+            <div className="font-semibold">
+              {collector.name}
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {collector.organization}
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              {collector.count} transactions
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-green-600 font-semibold">
+              {collector.total.toLocaleString()} €
+            </div>
+
+            <Link
+              href={`/agents/${collector.id}`}
+              className="text-muted-foreground hover:text-black transition"
+            >
+              <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       ))}
     </CardContent>
