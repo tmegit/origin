@@ -64,6 +64,22 @@ export default async function TransactionDetail({
   }
 
   // =========================
+  // NORMALISATION RELATIONS
+  // =========================
+
+  const company = Array.isArray(tx.companies)
+    ? tx.companies[0]
+    : tx.companies
+
+  const director = Array.isArray(tx.directors)
+    ? tx.directors[0]
+    : tx.directors
+
+  const agent = Array.isArray(tx.agents)
+    ? tx.agents[0]
+    : tx.agents
+
+  // =========================
   // RENDER
   // =========================
 
@@ -89,12 +105,10 @@ export default async function TransactionDetail({
         </div>
       </div>
 
-      {/* GRID LAYOUT */}
+      {/* GRID */}
       <div className="grid grid-cols-3 gap-6">
 
-        {/* =========================
-            MAIN DETAILS
-        ========================== */}
+        {/* ================= MAIN DETAILS ================= */}
         <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Détails de la transaction</CardTitle>
@@ -159,8 +173,8 @@ export default async function TransactionDetail({
                   Collecteur
                 </div>
                 <div>
-                  {tx.agents
-                    ? `${tx.agents.first_name} ${tx.agents.last_name}`
+                  {agent
+                    ? `${agent.first_name} ${agent.last_name}`
                     : "—"}
                 </div>
               </div>
@@ -169,9 +183,7 @@ export default async function TransactionDetail({
           </CardContent>
         </Card>
 
-        {/* =========================
-            ENTREPRISE LIÉE
-        ========================== */}
+        {/* ================= ENTREPRISE ================= */}
         <Card>
           <CardHeader>
             <CardTitle>Entreprise liée</CardTitle>
@@ -179,18 +191,18 @@ export default async function TransactionDetail({
 
           <CardContent className="space-y-3 text-sm">
 
-            {tx.companies ? (
+            {company ? (
               <>
                 <div className="font-medium">
-                  {tx.companies.company_name}
+                  {company.company_name}
                 </div>
 
                 <div className="text-muted-foreground text-xs">
-                  {tx.companies.geo_name}
+                  {company.geo_name}
                 </div>
 
                 <Link
-                  href={`/companies/${tx.companies.id_temp}`}
+                  href={`/companies/${company.id_temp}`}
                   className="text-sm text-blue-600 hover:underline"
                 >
                   Voir la fiche entreprise →
@@ -203,9 +215,7 @@ export default async function TransactionDetail({
           </CardContent>
         </Card>
 
-        {/* =========================
-            DIRECTEUR LIÉ
-        ========================== */}
+        {/* ================= DIRECTEUR ================= */}
         <Card>
           <CardHeader>
             <CardTitle>Directeur lié</CardTitle>
@@ -213,15 +223,14 @@ export default async function TransactionDetail({
 
           <CardContent className="space-y-3 text-sm">
 
-            {tx.directors ? (
+            {director ? (
               <>
                 <div className="font-medium">
-                  {tx.directors.first_name}{" "}
-                  {tx.directors.last_name}
+                  {director.first_name} {director.last_name}
                 </div>
 
                 <Link
-                  href={`/directors/${tx.directors.id_director}`}
+                  href={`/directors/${director.id_director}`}
                   className="text-sm text-blue-600 hover:underline"
                 >
                   Voir la fiche directeur →
