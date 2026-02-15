@@ -29,11 +29,15 @@ export default async function TransactionDetail({
       status,
       due_date,
       paid_at,
+      created_at,
       type_details,
       companies:company_id (
-        company_name
+        id_temp,
+        company_name,
+        geo_name
       ),
       directors:director_id (
+        id_director,
         first_name,
         last_name
       ),
@@ -49,7 +53,10 @@ export default async function TransactionDetail({
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold">Transaction introuvable</h1>
-        <Link href="/transactions" className="text-blue-600 underline">
+        <Link
+          href="/transactions"
+          className="text-blue-600 underline"
+        >
           Retour aux transactions
         </Link>
       </div>
@@ -62,80 +69,172 @@ export default async function TransactionDetail({
 
   return (
     <div className="p-8 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
-          Transaction {tx.id_transaction.slice(0, 8)}
-        </h1>
 
+      {/* HEADER */}
+      <div className="flex items-center gap-4">
         <Link
           href="/transactions"
           className="text-sm text-muted-foreground hover:text-black"
         >
-          ← Retour
+          ← Retour aux transactions
         </Link>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Détails</CardTitle>
-        </CardHeader>
+      <div>
+        <h1 className="text-3xl font-bold">
+          Transaction {tx.id_transaction.slice(0, 8)}
+        </h1>
+        <div className="text-sm text-muted-foreground">
+          ID complet : {tx.id_transaction}
+        </div>
+      </div>
 
-        <CardContent className="grid grid-cols-2 gap-6 text-sm">
+      {/* GRID LAYOUT */}
+      <div className="grid grid-cols-3 gap-6">
 
-          <div>
-            <div className="text-muted-foreground">Entreprise</div>
-            <div className="font-medium">
-              {tx.companies?.company_name ?? "—"}
+        {/* =========================
+            MAIN DETAILS
+        ========================== */}
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Détails de la transaction</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-6 text-sm">
+
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-muted-foreground">Statut</div>
+                <StatusBadge status={tx.status} />
+              </div>
+
+              <div className="text-right">
+                <div className="text-muted-foreground">Montant</div>
+                <div className="text-2xl font-bold">
+                  {Number(tx.amount).toLocaleString()} €
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <div className="text-muted-foreground">Directeur</div>
-            <div className="font-medium">
-              {tx.directors
-                ? `${tx.directors.first_name} ${tx.directors.last_name}`
-                : "—"}
+            <div className="grid grid-cols-2 gap-6">
+
+              <div>
+                <div className="text-muted-foreground">
+                  Type de transaction
+                </div>
+                <div className="font-medium">
+                  {tx.type_details ?? "—"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-muted-foreground">
+                  Notifiée le
+                </div>
+                <div>
+                  {tx.created_at?.slice(0, 10)}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-muted-foreground">
+                  Due le
+                </div>
+                <div>
+                  {tx.due_date ?? "—"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-muted-foreground">
+                  Payé le
+                </div>
+                <div>
+                  {tx.paid_at ?? "Non payé"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-muted-foreground">
+                  Collecteur
+                </div>
+                <div>
+                  {tx.agents
+                    ? `${tx.agents.first_name} ${tx.agents.last_name}`
+                    : "—"}
+                </div>
+              </div>
+
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <div className="text-muted-foreground">Statut</div>
-            <StatusBadge status={tx.status} />
-          </div>
+        {/* =========================
+            ENTREPRISE LIÉE
+        ========================== */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Entreprise liée</CardTitle>
+          </CardHeader>
 
-          <div>
-            <div className="text-muted-foreground">Montant</div>
-            <div className="font-semibold">
-              {Number(tx.amount).toLocaleString()} €
-            </div>
-          </div>
+          <CardContent className="space-y-3 text-sm">
 
-          <div>
-            <div className="text-muted-foreground">Due Date</div>
-            <div>{tx.due_date ?? "—"}</div>
-          </div>
+            {tx.companies ? (
+              <>
+                <div className="font-medium">
+                  {tx.companies.company_name}
+                </div>
 
-          <div>
-            <div className="text-muted-foreground">Payé le</div>
-            <div>{tx.paid_at ?? "Non payé"}</div>
-          </div>
+                <div className="text-muted-foreground text-xs">
+                  {tx.companies.geo_name}
+                </div>
 
-          <div>
-            <div className="text-muted-foreground">Collecteur</div>
-            <div>
-              {tx.agents
-                ? `${tx.agents.first_name} ${tx.agents.last_name}`
-                : "—"}
-            </div>
-          </div>
+                <Link
+                  href={`/companies/${tx.companies.id_temp}`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Voir la fiche entreprise →
+                </Link>
+              </>
+            ) : (
+              <div>—</div>
+            )}
 
-          <div>
-            <div className="text-muted-foreground">Type</div>
-            <div>{tx.type_details ?? "—"}</div>
-          </div>
+          </CardContent>
+        </Card>
 
-        </CardContent>
-      </Card>
+        {/* =========================
+            DIRECTEUR LIÉ
+        ========================== */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Directeur lié</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3 text-sm">
+
+            {tx.directors ? (
+              <>
+                <div className="font-medium">
+                  {tx.directors.first_name}{" "}
+                  {tx.directors.last_name}
+                </div>
+
+                <Link
+                  href={`/directors/${tx.directors.id_director}`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Voir la fiche directeur →
+                </Link>
+              </>
+            ) : (
+              <div>—</div>
+            )}
+
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   )
 }
