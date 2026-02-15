@@ -195,54 +195,53 @@ const {
       </div>
 
       {/* MAP + LATEST TRANSACTIONS */}
-      <div className="grid grid-cols-4 gap-6">
-        {/* MAP */}
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Cartographie des entreprises</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full relative" style={{ aspectRatio: "2 / 1" }}>
-              <Map points={mapPoints} />
+<div className="grid grid-cols-4 gap-6">
+
+  <Card className="col-span-2 h-[500px] flex flex-col">
+    <CardHeader>
+      <CardTitle>Cartographie des entreprises</CardTitle>
+    </CardHeader>
+    <CardContent className="flex-1 p-0 min-h-0">
+      <Map points={mapPoints} />
+    </CardContent>
+  </Card>
+
+  <Card className="col-span-2 h-[500px] flex flex-col">
+    <CardHeader>
+      <CardTitle>Dernières transactions</CardTitle>
+    </CardHeader>
+    <CardContent className="flex-1 overflow-y-auto min-h-0 pr-4">
+      {latestTransactions?.map((tx: any) => (
+        <div
+          key={tx.id_transaction}
+          className="flex justify-between items-start border-b pb-3"
+        >
+          <div className="space-y-1">
+            <div className="font-medium">
+              {tx.companies?.company_name} ({tx.type_details})
             </div>
-          </CardContent>
-        </Card>
 
-        {/* LATEST TRANSACTIONS */}
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Dernières transactions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-{latestTransactions?.map((tx: any) => (
-  <div
-    key={tx.id_transaction}
-    className="flex justify-between items-start border-b pb-3"
-  >
-    <div className="space-y-1">
-      <div className="font-medium">
-        {tx.companies?.company_name} ({tx.type_details})
-      </div>
+            <div className="text-xs text-muted-foreground">
+              {tx.id_transaction}
+            </div>
 
-      <div className="text-xs text-muted-foreground">
-        {tx.id_transaction}
-      </div>
+            <div className="text-xs text-muted-foreground">
+              {tx.agents
+                ? `${tx.agents.first_name} ${tx.agents.last_name}`
+                : "—"}{" "}
+              ({tx.paid_at})
+            </div>
+          </div>
 
-      <div className="text-xs text-muted-foreground">
-        {tx.agents
-  ? `${tx.agents.first_name} ${tx.agents.last_name}`
-  : "—"} ({tx.paid_at})
-      </div>
-    </div>
+          <div className="text-green-600 font-semibold">
+            {Number(tx.amount).toLocaleString()} €
+          </div>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
 
-    <div className="text-green-600 font-semibold">
-      {Number(tx.amount).toLocaleString()} €
-    </div>
-  </div>
-))}
-          </CardContent>
-        </Card>
-      </div>
+</div>
     </div>
   )
 }
