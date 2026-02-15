@@ -1,72 +1,74 @@
 "use client"
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-} from "recharts"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
 
 type Props = {
-  validatedAmount: number
-  pendingAmount: number
-  lateAmount: number
-  recoveryRate: number
+  cities: string[]
 }
 
-export default function RecoveryChartClient({
-  validatedAmount = 0,
-  pendingAmount = 0,
-  lateAmount = 0,
-  recoveryRate = 0,
-}: Props) {
-  const data = [
-    { name: "Validé", value: validatedAmount },
-    { name: "En attente", value: pendingAmount },
-    { name: "Retard", value: lateAmount },
-  ]
+export default function FilterBar({ cities }: Props) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const COLORS = ["#16a34a", "#f59e0b", "#dc2626"]
+  const [city, setCity] = useState(searchParams.get("city") || "")
+  const [from, setFrom] = useState(searchParams.get("from") || "")
+  const [to, setTo] = useState(searchParams.get("to") || "")
+
+  const applyFilters = () => {
+    const params = new URLSearchParams()
+
+    if (city) params.set("city", city)
+    if (from) params.set("from", from)
+    if (to) params.set("to", to)
+
+    router.push(`/?${params.toString()}`)
+  }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow space-y-6">
-      <h2 className="text-lg font-semibold">
-        Qualité du recouvrement
-      </h2>
+    <div className="flex gap-3 items-end">
 
-<div style={{ width: "100%", height: 280 }}>
-  <ResponsiveContainer width="100%" height="100%">
-    <PieChart>
-      <Pie
-        data={data}
-        dataKey="value"
-        nameKey="name"
-        innerRadius={70}
-        outerRadius={100}
-        paddingAngle={4}
+      <div>
+        <label className="text-xs text-gray-500">Ville</label>
+        <input
+          list="cities"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="border rounded px-3 py-2 text-sm"
+        />
+        <datalist id="cities">
+          {cities.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
+      </div>
+
+      <div>
+        <label className="text-xs text-gray-500">Du</label>
+        <input
+          type="date"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          className="border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-gray-500">Au</label>
+        <input
+          type="date"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          className="border rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <button
+        onClick={applyFilters}
+        className="bg-black text-white px-4 py-2 rounded text-sm"
       >
-        {data.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index]} />
-        ))}
-      </Pie>
-    </PieChart>
-  </ResponsiveContainer>
-</div>
-
-      <div className="text-center">
-        <div className="text-3xl font-bold">
-          {recoveryRate.toFixed(1)}%
-        </div>
-        <div className="text-sm text-gray-500">
-          taux de recouvrement
-        </div>
-      </div>
-
-      <div className="text-sm text-gray-600 space-y-1">
-        <div>Validé : {validatedAmount.toLocaleString()} €</div>
-        <div>En attente : {pendingAmount.toLocaleString()} €</div>
-        <div>Retard : {lateAmount.toLocaleString()} €</div>
-      </div>
+        Filtrer
+      </button>
     </div>
   )
 }

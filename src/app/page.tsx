@@ -28,17 +28,17 @@ export default async function Dashboard(props: {
   // MAP DATA
   // =========================
 
-let companiesQuery = supabase
-  .from("companies")
-  .select("latitude, longitude, geo_name")
-  .not("latitude", "is", null)
-  .not("longitude", "is", null)
+  let companiesQuery = supabase
+    .from("companies")
+    .select("latitude, longitude, geo_name")
+    .not("latitude", "is", null)
+    .not("longitude", "is", null)
 
-if (city) {
-  companiesQuery = companiesQuery.eq("geo_name", city)
-}
+  if (city) {
+    companiesQuery = companiesQuery.eq("geo_name", city)
+  }
 
-const { data: companies } = await companiesQuery
+  const { data: companies } = await companiesQuery
 
   const mapPoints =
     companies
@@ -55,67 +55,67 @@ const { data: companies } = await companiesQuery
         lng: Number(c.longitude),
       })) || []
 
-// =========================
-// KPI ENTREPRISES
-// =========================
+  // =========================
+  // KPI ENTREPRISES
+  // =========================
 
-let totalCompaniesQuery = supabase
-  .from("companies")
-  .select("*", { count: "exact", head: true })
+  let totalCompaniesQuery = supabase
+    .from("companies")
+    .select("*", { count: "exact", head: true })
 
-if (city) {
-  totalCompaniesQuery = totalCompaniesQuery.eq("geo_name", city)
-}
+  if (city) {
+    totalCompaniesQuery = totalCompaniesQuery.eq("geo_name", city)
+  }
 
-const { count: totalCompanies } = await totalCompaniesQuery
+  const { count: totalCompanies } = await totalCompaniesQuery
 
-let formalizedQuery = supabase
-  .from("companies")
-  .select("*", { count: "exact", head: true })
-  .eq("company_formal_status", "formalized")
+  let formalizedQuery = supabase
+    .from("companies")
+    .select("*", { count: "exact", head: true })
+    .eq("company_formal_status", "formalized")
 
-if (city) {
-  formalizedQuery = formalizedQuery.eq("geo_name", city)
-}
+  if (city) {
+    formalizedQuery = formalizedQuery.eq("geo_name", city)
+  }
 
-const { count: formalizedCompanies } = await formalizedQuery
+  const { count: formalizedCompanies } = await formalizedQuery
 
-const total = totalCompanies ?? 0
-const formalized = formalizedCompanies ?? 0
+  const total = totalCompanies ?? 0
+  const formalized = formalizedCompanies ?? 0
 
-const formalizationRate =
-  total > 0 ? ((formalized / total) * 100).toFixed(1) : "0.0"
+  const formalizationRate =
+    total > 0 ? ((formalized / total) * 100).toFixed(1) : "0.0"
 
   // =========================
   // KPI TRANSACTIONS
   // =========================
 
-let kpiTxQuery = supabase
-  .from("transactions")
-  .select(`
-    amount,
-    status,
-    due_date,
-    companies ( geo_name )
-  `)
+  let kpiTxQuery = supabase
+    .from("transactions")
+    .select(`
+      amount,
+      status,
+      due_date,
+      companies ( geo_name )
+    `)
 
-if (from) kpiTxQuery = kpiTxQuery.gte("due_date", from)
-if (to) kpiTxQuery = kpiTxQuery.lte("due_date", to)
-if (city) kpiTxQuery = kpiTxQuery.eq("companies.geo_name", city)
+  if (from) kpiTxQuery = kpiTxQuery.gte("due_date", from)
+  if (to) kpiTxQuery = kpiTxQuery.lte("due_date", to)
+  if (city) kpiTxQuery = kpiTxQuery.eq("companies.geo_name", city)
 
-const { data: kpiTransactions } = await kpiTxQuery
+  const { data: kpiTransactions } = await kpiTxQuery
 
-let validatedAmount = 0
-let lateAmount = 0
+  let validatedAmount = 0
+  let lateAmount = 0
 
-kpiTransactions?.forEach((tx: any) => {
-  if (tx.status === "validated") {
-    validatedAmount += Number(tx.amount)
-  }
-  if (tx.status === "late") {
-    lateAmount += Number(tx.amount)
-  }
-})
+  kpiTransactions?.forEach((tx: any) => {
+    if (tx.status === "validated") {
+      validatedAmount += Number(tx.amount)
+    }
+    if (tx.status === "late") {
+      lateAmount += Number(tx.amount)
+    }
+  })
 
   const totalTransactionsAmount = validatedAmount + lateAmount
 
@@ -208,23 +208,26 @@ kpiTransactions?.forEach((tx: any) => {
         directorName,
         total: 0,
         companies: new Set(),
-        oldestDueDate: tx.due_date,
+        oldestDueDate: tx.due_date ?? null,
       }
     }
 
     debtorMap[tx.director_id].total += Number(tx.amount)
 
-    if (tx.companies?.company_name)
+    if (tx.companies?.company_name) {
       debtorMap[tx.director_id].companies.add(tx.companies.company_name)
+    }
 
     if (
       tx.due_date &&
-      (!debtorMap[tx.director_id].oldestDueDate ||
-        tx.due_date < debtorMap[tx.director_id].oldestDueDate)
+      (
+        !debtorMap[tx.director_id].oldestDueDate ||
+        tx.due_date < debtorMap[tx.director_id].oldestDueDate!
+      )
     ) {
       debtorMap[tx.director_id].oldestDueDate = tx.due_date
     }
-  })
+  }) // ← TU AVAIS OUBLIÉ ÇA
 
   const sortedDebtors = Object.entries(debtorMap)
     .map(([id, data]) => ({
@@ -294,6 +297,21 @@ kpiTransactions?.forEach((tx: any) => {
     .slice(0, 5)
 
   // =========================
+  // AUTO-COMPLETE CITIES
+  // =========================
+
+  const { data: citiesData } = await supabase
+    .from("companies")
+    .select("geo_name")
+    .not("geo_name", "is", null)
+
+  const cities =
+    citiesData
+      ?.map((c) => c.geo_name)
+      .filter((v, i, arr) => v && arr.indexOf(v) === i)
+      .sort() ?? []
+
+  // =========================
   // RENDER
   // =========================
 
@@ -301,7 +319,7 @@ kpiTransactions?.forEach((tx: any) => {
     <div className="p-8 space-y-8">
       <div className="flex justify-between items-start">
         <h1 className="text-3xl font-bold">Tableau de bord</h1>
-        <FilterBar />
+<FilterBar cities={cities} />
       </div>
 
       {/* KPI */}
