@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import StatusBadge from "@/components/StatusBadge"
+import FilterBar from "@/components/FilterBar"
 
 export const dynamic = "force-dynamic"
 
@@ -15,6 +16,10 @@ export default async function TransactionsPage(props: {
   searchParams: Promise<{
     page?: string
     limit?: string
+    city?: string
+    from?: string
+    to?: string
+    status?: string
   }>
 }) {
   const searchParams = await props.searchParams
@@ -22,36 +27,18 @@ export default async function TransactionsPage(props: {
   const page = Number(searchParams?.page ?? 1)
   const limit = Number(searchParams?.limit ?? 25)
 
+  const city = searchParams?.city
+  const from = searchParams?.from
+  const to = searchParams?.to
+  const status = searchParams?.status
+
   const offset = (page - 1) * limit
 
   // =========================
-  // KPI
+  // BASE QUERY (FILTER LOGIC)
   // =========================
 
-  const { data: kpiData } = await supabase
-    .from("transactions")
-    .select("amount, status")
-
-  let validatedAmount = 0
-  let pendingAmount = 0
-  let lateAmount = 0
-
-  kpiData?.forEach((tx: any) => {
-    if (tx.status === "validated") validatedAmount += Number(tx.amount)
-    if (tx.status === "pending") pendingAmount += Number(tx.amount)
-    if (tx.status === "late") lateAmount += Number(tx.amount)
-  })
-
-  const totalAmount = validatedAmount + pendingAmount + lateAmount
-
-  // =========================
-  // TRANSACTIONS (PAGINATED)
-  // =========================
-
-  const {
-    data: transactions,
-    count,
-  } = await supabase
+  let baseQuery = supabase
     .from("transactions")
     .select(
       `
@@ -60,7 +47,8 @@ export default async function TransactionsPage(props: {
       status,
       due_date,
       companies:company_id (
-        company_name
+        company_name,
+        geo_name
       ),
       directors:director_id (
         first_name,
@@ -73,6 +61,45 @@ export default async function TransactionsPage(props: {
     `,
       { count: "exact" }
     )
+
+  if (city) baseQuery = baseQuery.eq("companies.geo_name", city)
+  if (from) baseQuery = baseQuery.gte("due_date", from)
+  if (to) baseQuery = baseQuery.lte("due_date", to)
+  if (status) baseQuery = baseQuery.eq("status", status)
+
+  // =========================
+  // KPI (FILTERED)
+  // =========================
+
+  let kpiQuery = supabase
+    .from("transactions")
+    .select("amount, status, companies ( geo_name )")
+
+  if (city) kpiQuery = kpiQuery.eq("companies.geo_name", city)
+  if (from) kpiQuery = kpiQuery.gte("due_date", from)
+  if (to) kpiQuery = kpiQuery.lte("due_date", to)
+  if (status) kpiQuery = kpiQuery.eq("status", status)
+
+  const { data: kpiData } = await kpiQuery
+
+  let validatedAmount = 0
+  let pendingAmount = 0
+  let lateAmount = 0
+
+  kpiData?.forEach((tx: any) => {
+    if (tx.status === "validated") validatedAmount += Number(tx.amount)
+    if (tx.status === "pending") pendingAmount += Number(tx.amount)
+    if (tx.status === "late") lateAmount += Number(tx.amount)
+  })
+
+  const totalAmount =
+    validatedAmount + pendingAmount + lateAmount
+
+  // =========================
+  // PAGINATED DATA
+  // =========================
+
+  const { data: transactions, count } = await baseQuery
     .order("due_date", { ascending: false })
     .range(offset, offset + limit - 1)
 
@@ -80,12 +107,50 @@ export default async function TransactionsPage(props: {
   const totalPages = Math.ceil(totalCount / limit)
 
   // =========================
+  // AUTO-COMPLETE CITIES
+  // =========================
+
+  const { data: citiesData } = await supabase
+    .from("companies")
+    .select("geo_name")
+    .not("geo_name", "is", null)
+
+  const cities =
+    citiesData
+      ?.map((c) => c.geo_name)
+      .filter((v, i, arr) => v && arr.indexOf(v) === i)
+      .sort() ?? []
+
+  // =========================
+  // BUILD QUERY STRING HELPER
+  // =========================
+
+  const buildQuery = (newParams: Record<string, any>) => {
+    const params = new URLSearchParams()
+
+    if (city) params.set("city", city)
+    if (from) params.set("from", from)
+    if (to) params.set("to", to)
+    if (status) params.set("status", status)
+
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value !== undefined) params.set(key, String(value))
+    })
+
+    return `/transactions?${params.toString()}`
+  }
+
+  // =========================
   // RENDER
   // =========================
 
   return (
     <div className="p-8 space-y-8">
-      <h1 className="text-3xl font-bold">Transactions</h1>
+
+      <div className="flex justify-between items-start">
+        <h1 className="text-3xl font-bold">Transactions</h1>
+        <FilterBar cities={cities} />
+      </div>
 
       {/* KPI */}
       <div className="grid grid-cols-4 gap-6">
@@ -153,7 +218,9 @@ export default async function TransactionsPage(props: {
           <tbody>
             {transactions?.map((tx: any) => (
               <tr key={tx.id_transaction} className="border-b">
-                <td className="p-4">{tx.id_transaction.slice(0, 8)}</td>
+                <td className="p-4">
+                  {tx.id_transaction.slice(0, 8)}
+                </td>
 
                 <td className="p-4">
                   {tx.companies?.company_name ?? "—"}
@@ -165,9 +232,9 @@ export default async function TransactionsPage(props: {
                     : "—"}
                 </td>
 
-<td className="p-4">
-  <StatusBadge status={tx.status} />
-</td>
+                <td className="p-4">
+                  <StatusBadge status={tx.status} />
+                </td>
 
                 <td className="p-4 font-semibold">
                   {Number(tx.amount).toLocaleString()} €
@@ -197,12 +264,12 @@ export default async function TransactionsPage(props: {
         {/* PAGINATION */}
         <div className="flex justify-between items-center p-4 border-t bg-gray-50">
 
-          {/* LIMIT SELECTOR */}
+          {/* LIMIT */}
           <div className="flex gap-2 text-sm">
             {[25, 50, 100].map((l) => (
               <Link
                 key={l}
-                href={`/transactions?page=1&limit=${l}`}
+                href={buildQuery({ page: 1, limit: l })}
                 className={`px-3 py-1 rounded ${
                   l === limit
                     ? "bg-black text-white"
@@ -214,11 +281,11 @@ export default async function TransactionsPage(props: {
             ))}
           </div>
 
-          {/* PAGE NAVIGATION */}
+          {/* PAGE NAV */}
           <div className="flex gap-2 text-sm items-center">
             {page > 1 && (
               <Link
-                href={`/transactions?page=${page - 1}&limit=${limit}`}
+                href={buildQuery({ page: page - 1, limit })}
                 className="px-3 py-1 bg-white border rounded"
               >
                 Précédent
@@ -231,7 +298,7 @@ export default async function TransactionsPage(props: {
 
             {page < totalPages && (
               <Link
-                href={`/transactions?page=${page + 1}&limit=${limit}`}
+                href={buildQuery({ page: page + 1, limit })}
                 className="px-3 py-1 bg-white border rounded"
               >
                 Suivant

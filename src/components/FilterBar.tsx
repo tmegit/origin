@@ -1,77 +1,114 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
-type Props = { cities: string[] }
+type Props = {
+  cities: string[]
+}
 
 export default function FilterBar({ cities }: Props) {
-
   const router = useRouter()
-  const sp = useSearchParams()
+  const searchParams = useSearchParams()
 
-  const [city, setCity] = useState(sp.get("city") ?? "")
-  const [from, setFrom] = useState(sp.get("from") ?? "")
-  const [to, setTo] = useState(sp.get("to") ?? "")
+  const [city, setCity] = useState(searchParams.get("city") ?? "")
+  const [from, setFrom] = useState(searchParams.get("from") ?? "")
+  const [to, setTo] = useState(searchParams.get("to") ?? "")
+  const [status, setStatus] = useState(searchParams.get("status") ?? "")
 
-  const cityOptions = useMemo(
-    () => (Array.isArray(cities) ? cities.filter(Boolean) : []),
-    [cities]
-  )
-
-  const apply = () => {
+  const applyFilters = () => {
     const params = new URLSearchParams()
+
     if (city) params.set("city", city)
     if (from) params.set("from", from)
     if (to) params.set("to", to)
-    router.push(`/?${params.toString()}`)
+    if (status) params.set("status", status)
+
+    router.push(`?${params.toString()}`)
+  }
+
+  const resetFilters = () => {
+    setCity("")
+    setFrom("")
+    setTo("")
+    setStatus("")
+    router.push("?")
   }
 
   return (
-    <div className="flex items-end gap-4">
+    <div className="flex gap-4 items-end">
 
-      <div className="flex flex-col">
-        <label className="text-xs text-muted-foreground">Ville</label>
+      {/* VILLE */}
+      <div className="flex flex-col text-sm">
+        <label className="text-muted-foreground">Ville</label>
         <input
-          list="cities-list-unique"
+          list="cities"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          placeholder="La Rochelle…"
-          className="border rounded px-2 py-1 text-sm w-[220px]"
+          className="border rounded px-3 py-2"
+          placeholder="Ex: La Rochelle"
         />
-        <datalist id="cities-list-unique">
-          {cityOptions.map((c) => (
+        <datalist id="cities">
+          {cities.map((c) => (
             <option key={c} value={c} />
           ))}
         </datalist>
       </div>
 
-      <div className="flex flex-col">
-        <label className="text-xs text-muted-foreground">Du</label>
+      {/* DATE FROM */}
+      <div className="flex flex-col text-sm">
+        <label className="text-muted-foreground">Du</label>
         <input
           type="date"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-3 py-2"
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="text-xs text-muted-foreground">Au</label>
+      {/* DATE TO */}
+      <div className="flex flex-col text-sm">
+        <label className="text-muted-foreground">Au</label>
         <input
           type="date"
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-3 py-2"
         />
       </div>
 
-      <button
-        onClick={apply}
-        className="bg-black text-white px-4 py-2 rounded text-sm"
-      >
-        Filtrer
-      </button>
+      {/* STATUT */}
+      <div className="flex flex-col text-sm">
+        <label className="text-muted-foreground">Statut</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
+          <option value="">Tous</option>
+          <option value="validated">Validé</option>
+          <option value="pending">En attente</option>
+          <option value="late">En retard</option>
+        </select>
+      </div>
+
+      {/* ACTIONS */}
+      <div className="flex gap-2">
+        <button
+          onClick={applyFilters}
+          className="bg-black text-white px-4 py-2 rounded text-sm"
+        >
+          Filtrer
+        </button>
+
+        <button
+          onClick={resetFilters}
+          className="border px-4 py-2 rounded text-sm"
+        >
+          Reset
+        </button>
+      </div>
+
     </div>
   )
 }
