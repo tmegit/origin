@@ -5,9 +5,13 @@ import { useState } from "react"
 
 type Props = {
   cities: string[]
+  showStatus?: boolean
 }
 
-export default function FilterBar({ cities }: Props) {
+export default function FilterBar({
+  cities,
+  showStatus = false,
+}: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -22,7 +26,7 @@ export default function FilterBar({ cities }: Props) {
     if (city) params.set("city", city)
     if (from) params.set("from", from)
     if (to) params.set("to", to)
-    if (status) params.set("status", status)
+    if (showStatus && status) params.set("status", status)
 
     router.push(`?${params.toString()}`)
   }
@@ -36,7 +40,7 @@ export default function FilterBar({ cities }: Props) {
   }
 
   return (
-    <div className="flex gap-4 items-end">
+    <div className="flex gap-4 items-end flex-wrap">
 
       {/* VILLE */}
       <div className="flex flex-col text-sm">
@@ -77,20 +81,22 @@ export default function FilterBar({ cities }: Props) {
         />
       </div>
 
-      {/* STATUT */}
-      <div className="flex flex-col text-sm">
-        <label className="text-muted-foreground">Statut</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="">Tous</option>
-          <option value="validated">Validé</option>
-          <option value="pending">En attente</option>
-          <option value="late">En retard</option>
-        </select>
-      </div>
+      {/* STATUT (optionnel) */}
+      {showStatus && (
+        <div className="flex flex-col text-sm">
+          <label className="text-muted-foreground">Statut</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">Tous</option>
+            <option value="validated">Validé</option>
+            <option value="pending">En attente</option>
+            <option value="late">En retard</option>
+          </select>
+        </div>
+      )}
 
       {/* ACTIONS */}
       <div className="flex gap-2">
@@ -108,7 +114,6 @@ export default function FilterBar({ cities }: Props) {
           Reset
         </button>
       </div>
-
     </div>
   )
 }

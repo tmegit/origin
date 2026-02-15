@@ -149,7 +149,7 @@ export default async function TransactionsPage(props: {
 
       <div className="flex justify-between items-start">
         <h1 className="text-3xl font-bold">Transactions</h1>
-        <FilterBar cities={cities} />
+        <FilterBar cities={cities} showStatus />
       </div>
 
       {/* KPI */}

@@ -1,5 +1,12 @@
+// src/app/layout.tsx
 import "./globals.css"
 import Sidebar from "@/components/Sidebar"
+
+export const metadata = {
+  icons: {
+    icon: "/icon.svg",
+  },
+}
 
 export default function RootLayout({
   children,
@@ -8,13 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body>
-        <div className="flex">
-          <Sidebar />
-          <main className="flex-1 bg-gray-50 min-h-screen">
-            {children}
-          </main>
-        </div>
+      <body className="flex min-h-screen bg-gray-50">
+        <Sidebar />
+
+        <main className="flex-1 p-8">
+          {children}
+        </main>
       </body>
     </html>
   )
