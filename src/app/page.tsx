@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Map from "@/components/Map"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -233,9 +235,18 @@ const {
             </div>
           </div>
 
-          <div className="text-green-600 font-semibold">
-            {Number(tx.amount).toLocaleString()} €
-          </div>
+<div className="flex items-center gap-3">
+  <div className="text-green-600 font-semibold">
+    {Number(tx.amount).toLocaleString()} €
+  </div>
+
+  <Link
+    href={`/transactions/${tx.id_transaction}`}
+    className="text-muted-foreground hover:text-black transition"
+  >
+    <ArrowRight size={18} />
+  </Link>
+</div>
         </div>
       ))}
     </CardContent>
