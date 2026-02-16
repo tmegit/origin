@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import StatusBadge from "@/components/StatusBadge"
 import FilterBar from "@/components/FilterBar"
+import FilterToggle from "@/components/FilterToggle"
 
 export const dynamic = "force-dynamic"
 
@@ -35,7 +36,7 @@ export default async function TransactionsPage(props: {
   const offset = (page - 1) * limit
 
   // =========================
-  // BASE QUERY (FILTER LOGIC)
+  // BASE QUERY
   // =========================
 
   let baseQuery = supabase
@@ -68,7 +69,7 @@ export default async function TransactionsPage(props: {
   if (status) baseQuery = baseQuery.eq("status", status)
 
   // =========================
-  // KPI (FILTERED)
+  // KPI
   // =========================
 
   let kpiQuery = supabase
@@ -92,11 +93,10 @@ export default async function TransactionsPage(props: {
     if (tx.status === "late") lateAmount += Number(tx.amount)
   })
 
-  const totalAmount =
-    validatedAmount + pendingAmount + lateAmount
+  const totalAmount = validatedAmount + pendingAmount + lateAmount
 
   // =========================
-  // PAGINATED DATA
+  // DATA
   // =========================
 
   const { data: transactions, count } = await baseQuery
@@ -107,7 +107,7 @@ export default async function TransactionsPage(props: {
   const totalPages = Math.ceil(totalCount / limit)
 
   // =========================
-  // AUTO-COMPLETE CITIES
+  // CITIES
   // =========================
 
   const { data: citiesData } = await supabase
@@ -121,13 +121,8 @@ export default async function TransactionsPage(props: {
       .filter((v, i, arr) => v && arr.indexOf(v) === i)
       .sort() ?? []
 
-  // =========================
-  // BUILD QUERY STRING HELPER
-  // =========================
-
   const buildQuery = (newParams: Record<string, any>) => {
     const params = new URLSearchParams()
-
     if (city) params.set("city", city)
     if (from) params.set("from", from)
     if (to) params.set("to", to)
@@ -145,62 +140,109 @@ export default async function TransactionsPage(props: {
   // =========================
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
-      <div className="flex justify-between items-start">
-        <h1 className="text-3xl font-bold">Transactions</h1>
-        <FilterBar cities={cities} showStatus />
+      {/* HEADER */}
+      <div className="space-y-6">
+
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Transactions
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Suivi détaillé des paiements
+          </p>
+        </div>
+
+        {/* Mobile filters */}
+        <div className="block xl:hidden">
+          <FilterToggle>
+            <FilterBar cities={cities} showStatus />
+          </FilterToggle>
+        </div>
+
+        {/* Desktop filters */}
+        <div className="hidden xl:block bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <FilterBar cities={cities} showStatus />
+        </div>
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Total</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Total</CardTitle></CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">
+            <div className="text-2xl font-semibold">
               {totalAmount.toLocaleString()} €
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Validées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Validées</CardTitle></CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-green-600">
+            <div className="text-2xl font-semibold text-green-600">
               {validatedAmount.toLocaleString()} €
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>En attente</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>En attente</CardTitle></CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-yellow-500">
+            <div className="text-2xl font-semibold text-yellow-500">
               {pendingAmount.toLocaleString()} €
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>En retard</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>En retard</CardTitle></CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-red-600">
+            <div className="text-2xl font-semibold text-red-600">
               {lateAmount.toLocaleString()} €
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      {/* MOBILE CARDS */}
+      <div className="xl:hidden space-y-4">
+        {transactions?.map((tx: any) => (
+          <Card key={tx.id_transaction}>
+            <CardContent className="p-4 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">
+                  {tx.companies?.company_name ?? "—"}
+                </span>
+                <StatusBadge status={tx.status} />
+              </div>
+
+              <div className="text-sm text-muted-foreground">
+                {tx.directors
+                  ? `${tx.directors.first_name} ${tx.directors.last_name}`
+                  : "—"}
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">
+                  {Number(tx.amount).toLocaleString()} €
+                </span>
+                <Link href={`/transactions/${tx.id_transaction}`}>
+                  <ArrowRight size={18} />
+                </Link>
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                Due: {tx.due_date}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* DESKTOP TABLE */}
+      <div className="hidden xl:block bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr className="text-left">
@@ -209,7 +251,7 @@ export default async function TransactionsPage(props: {
               <th className="p-4">Directeur</th>
               <th className="p-4">Statut</th>
               <th className="p-4">Montant</th>
-              <th className="p-4">Due Date</th>
+              <th className="p-4">Due</th>
               <th className="p-4">Collecteur</th>
               <th className="p-4"></th>
             </tr>
@@ -218,41 +260,27 @@ export default async function TransactionsPage(props: {
           <tbody>
             {transactions?.map((tx: any) => (
               <tr key={tx.id_transaction} className="border-b">
-                <td className="p-4">
-                  {tx.id_transaction.slice(0, 8)}
-                </td>
-
-                <td className="p-4">
-                  {tx.companies?.company_name ?? "—"}
-                </td>
-
+                <td className="p-4">{tx.id_transaction.slice(0, 8)}</td>
+                <td className="p-4">{tx.companies?.company_name ?? "—"}</td>
                 <td className="p-4">
                   {tx.directors
                     ? `${tx.directors.first_name} ${tx.directors.last_name}`
                     : "—"}
                 </td>
-
                 <td className="p-4">
                   <StatusBadge status={tx.status} />
                 </td>
-
                 <td className="p-4 font-semibold">
                   {Number(tx.amount).toLocaleString()} €
                 </td>
-
                 <td className="p-4">{tx.due_date}</td>
-
                 <td className="p-4">
                   {tx.agents
                     ? `${tx.agents.first_name} ${tx.agents.last_name}`
                     : "—"}
                 </td>
-
                 <td className="p-4">
-                  <Link
-                    href={`/transactions/${tx.id_transaction}`}
-                    className="text-muted-foreground hover:text-black transition"
-                  >
+                  <Link href={`/transactions/${tx.id_transaction}`}>
                     <ArrowRight size={18} />
                   </Link>
                 </td>
@@ -260,53 +288,8 @@ export default async function TransactionsPage(props: {
             ))}
           </tbody>
         </table>
-
-        {/* PAGINATION */}
-        <div className="flex justify-between items-center p-4 border-t bg-gray-50">
-
-          {/* LIMIT */}
-          <div className="flex gap-2 text-sm">
-            {[25, 50, 100].map((l) => (
-              <Link
-                key={l}
-                href={buildQuery({ page: 1, limit: l })}
-                className={`px-3 py-1 rounded ${
-                  l === limit
-                    ? "bg-black text-white"
-                    : "bg-white border"
-                }`}
-              >
-                {l}
-              </Link>
-            ))}
-          </div>
-
-          {/* PAGE NAV */}
-          <div className="flex gap-2 text-sm items-center">
-            {page > 1 && (
-              <Link
-                href={buildQuery({ page: page - 1, limit })}
-                className="px-3 py-1 bg-white border rounded"
-              >
-                Précédent
-              </Link>
-            )}
-
-            <span>
-              Page {page} / {totalPages}
-            </span>
-
-            {page < totalPages && (
-              <Link
-                href={buildQuery({ page: page + 1, limit })}
-                className="px-3 py-1 bg-white border rounded"
-              >
-                Suivant
-              </Link>
-            )}
-          </div>
-        </div>
       </div>
+
     </div>
   )
 }

@@ -49,6 +49,8 @@
 }
 
 :root {
+    --radius: 0.625rem;
+  font-size: 13px;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -125,5 +127,8 @@
   body {
     @apply bg-background text-foreground;
     @apply bg-background text-foreground;
+  }
+    .card {
+    padding: 1.25rem; /* plus compact */
   }
 }

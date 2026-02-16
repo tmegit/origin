@@ -49,8 +49,8 @@ export default async function CompanyDetail(props: {
 
   if (!company) {
     return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Entreprise introuvable</h1>
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <h1 className="text-2xl font-semibold">Entreprise introuvable</h1>
         <Link
           href="/companies"
           className="text-sm text-muted-foreground hover:text-black"
@@ -61,7 +61,6 @@ export default async function CompanyDetail(props: {
     )
   }
 
-  // Supabase peut retourner un array
   const director = Array.isArray(company.directors)
     ? company.directors[0]
     : company.directors
@@ -83,9 +82,9 @@ export default async function CompanyDetail(props: {
     .order("due_date", { ascending: false })
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
-      {/* RETOUR */}
+      {/* BACK */}
       <Link
         href="/companies"
         className="text-sm text-muted-foreground hover:text-black"
@@ -94,16 +93,16 @@ export default async function CompanyDetail(props: {
       </Link>
 
       {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold">
+      <div className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
           {company.company_name ?? "[ND]"}
         </h1>
-        <div className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {company.company_address ??
             company.geocode_label ??
             company.geo_name ??
             "—"}
-        </div>
+        </p>
       </div>
 
       {/* FORMALISATION */}
@@ -112,23 +111,28 @@ export default async function CompanyDetail(props: {
       )}
 
       {/* INFO GRID */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid gap-6 grid-cols-1 xl:grid-cols-3">
 
         {/* ENTREPRISE */}
-        <Card className="col-span-2">
+        <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle>Entreprise</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-6 text-sm">
+
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
 
             <div>
               <div className="text-muted-foreground">ID</div>
-              <div className="font-medium">{company.id_temp}</div>
+              <div className="font-medium break-all">
+                {company.id_temp}
+              </div>
             </div>
 
             <div>
               <div className="text-muted-foreground">Ville</div>
-              <div className="font-medium">{company.geo_name ?? "—"}</div>
+              <div className="font-medium">
+                {company.geo_name ?? "—"}
+              </div>
             </div>
 
             <div>
@@ -141,9 +145,10 @@ export default async function CompanyDetail(props: {
               <ActivityStatusBadge value={company.company_status} />
             </div>
 
-            {/* ✅ NOUVEAU : Secteur NAF */}
-            <div className="col-span-2">
-              <div className="text-muted-foreground">Secteur d'activité (NAF)</div>
+            <div className="sm:col-span-2">
+              <div className="text-muted-foreground">
+                Secteur d'activité (NAF)
+              </div>
               <div className="font-medium">
                 {company.naf_code
                   ? `${company.naf_code} — ${company.naf_label}`
@@ -159,17 +164,20 @@ export default async function CompanyDetail(props: {
           <CardHeader>
             <CardTitle>Directeur</CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-2 text-sm">
             {director ? (
               <>
                 <div className="font-medium">
                   {director.first_name} {director.last_name}
                 </div>
+
                 <Link
                   href={`/directors/${director.id_director}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
                 >
-                  Voir la fiche directeur →
+                  Voir la fiche directeur
+                  <ArrowRight size={14} />
                 </Link>
               </>
             ) : (
@@ -192,51 +200,59 @@ export default async function CompanyDetail(props: {
         </CardHeader>
 
         <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr className="text-left">
-                <th className="p-4">Transaction</th>
-                <th className="p-4">Statut</th>
-                <th className="p-4">Montant</th>
-                <th className="p-4"></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {(transactions ?? []).map((tx: any) => (
-                <tr key={tx.id_transaction} className="border-b">
-                  <td className="p-4">
-                    <div className="font-medium">
-                      {tx.type_details ?? "—"}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Notifiée le : {tx.created_at?.slice(0, 10)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Due le : {tx.due_date ?? "—"}
-                    </div>
-                  </td>
-
-                  <td className="p-4">
-                    <StatusBadge status={tx.status} />
-                  </td>
-
-                  <td className="p-4 font-semibold">
-                    {Number(tx.amount).toLocaleString()} €
-                  </td>
-
-                  <td className="p-4">
-                    <Link
-                      href={`/transactions/${tx.id_transaction}`}
-                      className="text-muted-foreground hover:text-black transition"
-                    >
-                      <ArrowRight size={18} />
-                    </Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr className="text-left">
+                  <th className="p-4">Transaction</th>
+                  <th className="p-4">Statut</th>
+                  <th className="p-4">Montant</th>
+                  <th className="p-4"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {(transactions ?? []).map((tx: any) => (
+                  <tr
+                    key={tx.id_transaction}
+                    className="border-b hover:bg-gray-50"
+                  >
+                    <td className="p-4">
+                      <div className="font-medium">
+                        {tx.type_details ?? "—"}
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        Notifiée le : {tx.created_at?.slice(0, 10)}
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        Due le : {tx.due_date ?? "—"}
+                      </div>
+                    </td>
+
+                    <td className="p-4">
+                      <StatusBadge status={tx.status} />
+                    </td>
+
+                    <td className="p-4 font-semibold">
+                      {Number(tx.amount).toLocaleString()} €
+                    </td>
+
+                    <td className="p-4">
+                      <Link
+                        href={`/transactions/${tx.id_transaction}`}
+                        className="text-muted-foreground hover:text-black transition"
+                      >
+                        <ArrowRight size={18} />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+          </div>
         </CardContent>
       </Card>
 

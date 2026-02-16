@@ -39,33 +39,36 @@ export default function LeafletInnerMap({
   const center: LatLngExpression = [46.15, -1.15]
 
   return (
-    <MapContainer
-      center={center}
-      zoom={12}
-      scrollWheelZoom={false}
-style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div className="relative w-full h-full z-0">
+      <MapContainer
+        center={center}
+        zoom={12}
+        scrollWheelZoom={false}
+        className="w-full h-full z-0"
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-      {safePoints.map((p) => {
-        const position: LatLngExpression = [p.lat, p.lng]
+        {safePoints.map((p) => {
+          const position: LatLngExpression = [p.lat, p.lng]
 
-        return (
-          <CircleMarker
-            key={p.id}
-            center={position}
-            pathOptions={{
-              color: "#b91c1c",
-              fillColor: "#b91c1c",
-              fillOpacity: 0.6,
-              weight: 0,
-            }}
-            radius={2}
-          />
-        )
-      })}
-    </MapContainer>
+          return (
+            <CircleMarker
+              key={p.id}
+              center={position}
+              pathOptions={{
+                color: "#b91c1c",
+                fillColor: "#b91c1c",
+                fillOpacity: 0.6,
+                weight: 0,
+              }}
+              radius={2}
+            />
+          )
+        })}
+      </MapContainer>
+    </div>
   )
 }

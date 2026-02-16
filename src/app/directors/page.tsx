@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import FilterBar from "@/components/FilterBar"
+import FilterToggle from "@/components/FilterToggle"
 
 export const dynamic = "force-dynamic"
 
@@ -27,7 +28,7 @@ export default async function DirectorsPage(props: {
   const status = searchParams?.status
 
   // =========================
-  // FETCH TRANSACTIONS (FILTERED)
+  // FETCH TRANSACTIONS
   // =========================
 
   let query = supabase
@@ -94,11 +95,9 @@ export default async function DirectorsPage(props: {
     if (tx.status === "late") {
       directorMap[id].lateAmount += Number(tx.amount)
     }
-
     if (tx.status === "pending") {
       directorMap[id].pendingAmount += Number(tx.amount)
     }
-
     if (tx.status === "validated") {
       directorMap[id].validatedAmount += Number(tx.amount)
     }
@@ -121,21 +120,9 @@ export default async function DirectorsPage(props: {
   // =========================
 
   const totalDirectors = directors.length
-
-  const totalLateAmount = directors.reduce(
-    (sum, d) => sum + d.lateAmount,
-    0
-  )
-
-  const totalPendingAmount = directors.reduce(
-    (sum, d) => sum + d.pendingAmount,
-    0
-  )
-
-  const totalValidatedAmount = directors.reduce(
-    (sum, d) => sum + d.validatedAmount,
-    0
-  )
+  const totalLateAmount = directors.reduce((s, d) => s + d.lateAmount, 0)
+  const totalPendingAmount = directors.reduce((s, d) => s + d.pendingAmount, 0)
+  const totalValidatedAmount = directors.reduce((s, d) => s + d.validatedAmount, 0)
 
   // =========================
   // AUTOCOMPLETE VILLES
@@ -157,20 +144,43 @@ export default async function DirectorsPage(props: {
   // =========================
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex justify-between items-start">
-        <h1 className="text-3xl font-bold">Directeurs</h1>
-        <FilterBar cities={cities} showStatus />
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+
+      {/* HEADER */}
+      <div className="space-y-6">
+
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Directeurs
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Vue consolidée des responsables et de leur exposition
+          </p>
+        </div>
+
+        {/* Mobile filter */}
+        <div className="block xl:hidden">
+          <FilterToggle>
+            <FilterBar cities={cities} showStatus />
+          </FilterToggle>
+        </div>
+
+        {/* Desktop filter */}
+        <div className="hidden xl:block bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <FilterBar cities={cities} showStatus />
+        </div>
+
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+
         <Card>
           <CardHeader>
             <CardTitle>Total directeurs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">
+            <div className="text-2xl font-semibold">
               {totalDirectors}
             </div>
           </CardContent>
@@ -181,7 +191,7 @@ export default async function DirectorsPage(props: {
             <CardTitle>En retard</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-red-600">
+            <div className="text-2xl font-semibold text-red-600">
               {totalLateAmount.toLocaleString()} €
             </div>
           </CardContent>
@@ -192,7 +202,7 @@ export default async function DirectorsPage(props: {
             <CardTitle>En attente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-yellow-500">
+            <div className="text-2xl font-semibold text-yellow-500">
               {totalPendingAmount.toLocaleString()} €
             </div>
           </CardContent>
@@ -203,58 +213,79 @@ export default async function DirectorsPage(props: {
             <CardTitle>Validé</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold text-green-600">
+            <div className="text-2xl font-semibold text-green-600">
               {totalValidatedAmount.toLocaleString()} €
             </div>
           </CardContent>
         </Card>
+
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr className="text-left">
-              <th className="p-4">Directeur</th>
-              <th className="p-4">Entreprises</th>
-              <th className="p-4">Transactions</th>
-              <th className="p-4">En retard</th>
-              <th className="p-4">En attente</th>
-              <th className="p-4">Validé</th>
-              <th className="p-4"></th>
-            </tr>
-          </thead>
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr className="text-left">
+                  <th className="p-4">Directeur</th>
+                  <th className="p-4">Entreprises</th>
+                  <th className="p-4">Transactions</th>
+                  <th className="p-4">En retard</th>
+                  <th className="p-4">En attente</th>
+                  <th className="p-4">Validé</th>
+                  <th className="p-4"></th>
+                </tr>
+              </thead>
 
-          <tbody>
-            {directors.map((d) => (
-              <tr key={d.id} className="border-b">
-                <td className="p-4 font-medium">{d.name}</td>
-                <td className="p-4 text-muted-foreground">
-                  {d.companies.join(", ")}
-                </td>
-                <td className="p-4">{d.totalTransactions}</td>
-                <td className="p-4 text-red-600 font-semibold">
-                  {d.lateAmount.toLocaleString()} €
-                </td>
-                <td className="p-4 text-yellow-600 font-semibold">
-                  {d.pendingAmount.toLocaleString()} €
-                </td>
-                <td className="p-4 text-green-600 font-semibold">
-                  {d.validatedAmount.toLocaleString()} €
-                </td>
-                <td className="p-4">
-                  <Link
-                    href={`/directors/${d.id}`}
-                    className="text-muted-foreground hover:text-black transition"
+              <tbody>
+                {directors.map((d) => (
+                  <tr
+                    key={d.id}
+                    className="border-b hover:bg-gray-50"
                   >
-                    <ArrowRight size={18} />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td className="p-4 font-medium">
+                      {d.name}
+                    </td>
+
+                    <td className="p-4 text-muted-foreground max-w-xs truncate">
+                      {d.companies.join(", ")}
+                    </td>
+
+                    <td className="p-4">
+                      {d.totalTransactions}
+                    </td>
+
+                    <td className="p-4 text-red-600 font-semibold">
+                      {d.lateAmount.toLocaleString()} €
+                    </td>
+
+                    <td className="p-4 text-yellow-600 font-semibold">
+                      {d.pendingAmount.toLocaleString()} €
+                    </td>
+
+                    <td className="p-4 text-green-600 font-semibold">
+                      {d.validatedAmount.toLocaleString()} €
+                    </td>
+
+                    <td className="p-4">
+                      <Link
+                        href={`/directors/${d.id}`}
+                        className="text-muted-foreground hover:text-black transition"
+                      >
+                        <ArrowRight size={18} />
+                      </Link>
+                    </td>
+
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
     </div>
   )
 }

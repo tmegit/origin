@@ -4,6 +4,7 @@ import Map from "@/components/Map"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import FilterBar from "@/components/FilterBar"
+import FilterToggle from "@/components/FilterToggle"
 
 export const dynamic = "force-dynamic"
 
@@ -25,6 +26,21 @@ export default async function Dashboard(props: {
   const to = searchParams?.to
 
   // =========================
+  // CITIES
+  // =========================
+
+  const { data: citiesData } = await supabase
+    .from("companies")
+    .select("geo_name")
+    .not("geo_name", "is", null)
+
+  const cities =
+    citiesData
+      ?.map((c) => c.geo_name)
+      .filter((v, i, arr) => v && arr.indexOf(v) === i)
+      .sort() ?? []
+
+  // =========================
   // MAP DATA
   // =========================
 
@@ -34,9 +50,7 @@ export default async function Dashboard(props: {
     .not("latitude", "is", null)
     .not("longitude", "is", null)
 
-  if (city) {
-    companiesQuery = companiesQuery.eq("geo_name", city)
-  }
+  if (city) companiesQuery = companiesQuery.eq("geo_name", city)
 
   const { data: companies } = await companiesQuery
 
@@ -63,9 +77,7 @@ export default async function Dashboard(props: {
     .from("companies")
     .select("*", { count: "exact", head: true })
 
-  if (city) {
-    totalCompaniesQuery = totalCompaniesQuery.eq("geo_name", city)
-  }
+  if (city) totalCompaniesQuery = totalCompaniesQuery.eq("geo_name", city)
 
   const { count: totalCompanies } = await totalCompaniesQuery
 
@@ -74,9 +86,7 @@ export default async function Dashboard(props: {
     .select("*", { count: "exact", head: true })
     .eq("company_formal_status", "formalized")
 
-  if (city) {
-    formalizedQuery = formalizedQuery.eq("geo_name", city)
-  }
+  if (city) formalizedQuery = formalizedQuery.eq("geo_name", city)
 
   const { count: formalizedCompanies } = await formalizedQuery
 
@@ -109,12 +119,8 @@ export default async function Dashboard(props: {
   let lateAmount = 0
 
   kpiTransactions?.forEach((tx: any) => {
-    if (tx.status === "validated") {
-      validatedAmount += Number(tx.amount)
-    }
-    if (tx.status === "late") {
-      lateAmount += Number(tx.amount)
-    }
+    if (tx.status === "validated") validatedAmount += Number(tx.amount)
+    if (tx.status === "late") lateAmount += Number(tx.amount)
   })
 
   const totalTransactionsAmount = validatedAmount + lateAmount
@@ -141,14 +147,8 @@ export default async function Dashboard(props: {
       paid_at,
       due_date,
       type_details,
-      companies (
-        company_name,
-        geo_name
-      ),
-      agents (
-        first_name,
-        last_name
-      )
+      companies ( company_name ),
+      agents ( first_name, last_name )
     `)
     .eq("status", "validated")
 
@@ -170,14 +170,8 @@ export default async function Dashboard(props: {
       amount,
       due_date,
       director_id,
-      companies:company_id (
-        company_name,
-        geo_name
-      ),
-      directors:director_id (
-        first_name,
-        last_name
-      )
+      companies:company_id ( company_name ),
+      directors:director_id ( first_name, last_name )
     `)
     .eq("status", "late")
     .not("director_id", "is", null)
@@ -220,14 +214,12 @@ export default async function Dashboard(props: {
 
     if (
       tx.due_date &&
-      (
-        !debtorMap[tx.director_id].oldestDueDate ||
-        tx.due_date < debtorMap[tx.director_id].oldestDueDate!
-      )
+      (!debtorMap[tx.director_id].oldestDueDate ||
+        tx.due_date < debtorMap[tx.director_id].oldestDueDate!)
     ) {
       debtorMap[tx.director_id].oldestDueDate = tx.due_date
     }
-  }) // ← TU AVAIS OUBLIÉ ÇA
+  })
 
   const sortedDebtors = Object.entries(debtorMap)
     .map(([id, data]) => ({
@@ -246,36 +238,19 @@ export default async function Dashboard(props: {
     .from("transactions")
     .select(`
       amount,
-      due_date,
-      companies ( geo_name ),
-      agents (
-        id_agents,
-        first_name,
-        last_name,
-        organization
-      )
+      agents ( id_agents, first_name, last_name, organization )
     `)
     .eq("status", "validated")
-
-  if (from) collectorQuery = collectorQuery.gte("due_date", from)
-  if (to) collectorQuery = collectorQuery.lte("due_date", to)
-  if (city) collectorQuery = collectorQuery.eq("companies.geo_name", city)
 
   const { data: collectedTx } = await collectorQuery
 
   const collectorMap: Record<
     string,
-    {
-      name: string
-      organization: string
-      total: number
-      count: number
-    }
+    { name: string; organization: string; total: number; count: number }
   > = {}
 
   collectedTx?.forEach((tx: any) => {
     if (!tx.agents) return
-
     const id = tx.agents.id_agents
 
     if (!collectorMap[id]) {
@@ -297,53 +272,48 @@ export default async function Dashboard(props: {
     .slice(0, 5)
 
   // =========================
-  // AUTO-COMPLETE CITIES
-  // =========================
-
-  const { data: citiesData } = await supabase
-    .from("companies")
-    .select("geo_name")
-    .not("geo_name", "is", null)
-
-  const cities =
-    citiesData
-      ?.map((c) => c.geo_name)
-      .filter((v, i, arr) => v && arr.indexOf(v) === i)
-      .sort() ?? []
-
-  // =========================
   // RENDER
   // =========================
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex justify-between items-start">
-        <h1 className="text-3xl font-bold">Tableau de bord</h1>
-<FilterBar cities={cities} />
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+
+      {/* HEADER + FILTERS */}
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Tableau de bord
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Vue synthétique de l’activité territoriale
+          </p>
+        </div>
+
+        <div className="block xl:hidden">
+          <FilterToggle>
+            <FilterBar cities={cities} />
+          </FilterToggle>
+        </div>
+
+        <div className="hidden xl:block bg-white border rounded-2xl p-4 shadow-sm">
+          <FilterBar cities={cities} />
+        </div>
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Total entreprises détectées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Total entreprises détectées</CardTitle></CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">
-              {total.toLocaleString()}
-            </div>
+            <div className="text-2xl font-semibold">{total.toLocaleString()}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Entreprises formalisées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Entreprises formalisées</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold">
-                {formalized.toLocaleString()}
-              </span>
+              <span className="text-2xl font-bold">{formalized.toLocaleString()}</span>
               <span className="text-sm text-muted-foreground">
                 ({formalizationRate}%)
               </span>
@@ -352,12 +322,10 @@ export default async function Dashboard(props: {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Paiements en retard</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Paiements en retard</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-semibold text-red-600">
+              <span className="text-2xl font-semibold text-red-600">
                 {lateAmount.toLocaleString()} €
               </span>
               <span className="text-sm text-muted-foreground">
@@ -368,12 +336,10 @@ export default async function Dashboard(props: {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Paiements collectés</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Paiements collectés</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-semibold text-green-600">
+              <span className="text-2xl font-semibold text-green-600">
                 {validatedAmount.toLocaleString()} €
               </span>
               <span className="text-sm text-muted-foreground">
@@ -385,53 +351,33 @@ export default async function Dashboard(props: {
       </div>
 
       {/* MAP + LATEST */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 xl:grid-cols-4">
 
-        <Card className="col-span-2 h-[500px] flex flex-col">
-          <CardHeader>
-            <CardTitle>Cartographie des entreprises</CardTitle>
-          </CardHeader>
+        <Card className="xl:col-span-2 h-[400px] xl:h-[500px] flex flex-col">
+          <CardHeader><CardTitle>Cartographie des entreprises</CardTitle></CardHeader>
           <CardContent className="flex-1 p-0 min-h-0">
             <Map points={mapPoints} />
           </CardContent>
         </Card>
 
-        <Card className="col-span-2 h-[500px] flex flex-col">
-          <CardHeader>
-            <CardTitle>Dernières transactions</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto min-h-0 pr-4">
+        <Card className="xl:col-span-2 h-[400px] xl:h-[500px] flex flex-col">
+          <CardHeader><CardTitle>Dernières transactions</CardTitle></CardHeader>
+          <CardContent className="flex-1 overflow-y-auto min-h-0 pr-4 space-y-4">
             {latestTransactions?.map((tx: any) => (
-              <div
-                key={tx.id_transaction}
-                className="flex justify-between items-start border-b pb-3"
-              >
-                <div className="space-y-1">
+              <div key={tx.id_transaction} className="flex justify-between border-b pb-3">
+                <div>
                   <div className="font-medium">
                     {tx.companies?.company_name} ({tx.type_details})
                   </div>
-
                   <div className="text-xs text-muted-foreground">
                     {tx.id_transaction}
                   </div>
-
-                  <div className="text-xs text-muted-foreground">
-                    {tx.agents
-                      ? `${tx.agents.first_name} ${tx.agents.last_name}`
-                      : "—"}{" "}
-                    ({tx.paid_at})
-                  </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <div className="text-green-600 font-semibold">
                     {Number(tx.amount).toLocaleString()} €
                   </div>
-
-                  <Link
-                    href={`/transactions/${tx.id_transaction}`}
-                    className="text-muted-foreground hover:text-black transition"
-                  >
+                  <Link href={`/transactions/${tx.id_transaction}`}>
                     <ArrowRight size={18} />
                   </Link>
                 </div>
@@ -442,91 +388,94 @@ export default async function Dashboard(props: {
       </div>
 
       {/* DEBITEURS + COLLECTEURS */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 xl:grid-cols-4">
 
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Top débiteurs</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {sortedDebtors.map((debtor) => (
-              <div
-                key={debtor.id}
-                className="flex justify-between items-start border-b pb-3"
-              >
-                <div className="space-y-1">
-                  <div className="font-semibold">
-                    {debtor.directorName}
-                  </div>
+<Card className="xl:col-span-2">
+  <CardHeader>
+    <CardTitle>Top débiteurs</CardTitle>
+  </CardHeader>
 
-                  <div className="text-sm text-muted-foreground">
-                    {debtor.companies.join(", ")}
-                  </div>
+  <CardContent className="space-y-4">
+    {sortedDebtors.map((debtor) => (
+      <div
+        key={debtor.id}
+        className="flex justify-between items-start border-b pb-3"
+      >
+        <div className="space-y-1">
+          <div className="font-semibold">
+            {debtor.directorName}
+          </div>
 
-                  <div className="text-xs text-red-600">
-                    En retard depuis le : {debtor.oldestDueDate}
-                  </div>
-                </div>
+          <div className="text-sm text-muted-foreground">
+            {debtor.companies.join(", ")}
+          </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="text-red-600 font-semibold">
-                    {debtor.total.toLocaleString()} €
-                  </div>
+          <div className="text-xs text-red-600">
+            En retard depuis le : {debtor.oldestDueDate}
+          </div>
+        </div>
 
-                  <Link
-                    href={`/directors/${debtor.id}`}
-                    className="text-muted-foreground hover:text-black transition"
-                  >
-                    <ArrowRight size={18} />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-3">
+          <div className="text-red-600 font-semibold">
+            {debtor.total.toLocaleString()} €
+          </div>
 
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Top collecteurs</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {topCollectors.map((collector) => (
-              <div
-                key={collector.id}
-                className="flex justify-between items-start border-b pb-3"
-              >
-                <div className="space-y-1">
-                  <div className="font-semibold">
-                    {collector.name}
-                  </div>
+          <Link
+            href={`/directors/${debtor.id}`}
+            className="text-muted-foreground hover:text-black transition"
+          >
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+      </div>
+    ))}
+  </CardContent>
+</Card>
 
-                  <div className="text-sm text-muted-foreground">
-                    {collector.organization}
-                  </div>
+<Card className="xl:col-span-2">
+  <CardHeader>
+    <CardTitle>Top collecteurs</CardTitle>
+  </CardHeader>
 
-                  <div className="text-xs text-muted-foreground">
-                    {collector.count} transactions
-                  </div>
-                </div>
+  <CardContent className="space-y-4">
+    {topCollectors.map((collector) => (
+      <div
+        key={collector.id}
+        className="flex justify-between items-start border-b pb-3"
+      >
+        <div className="space-y-1">
+          <div className="font-semibold">
+            {collector.name}
+          </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="text-green-600 font-semibold">
-                    {collector.total.toLocaleString()} €
-                  </div>
+          <div className="text-sm text-muted-foreground">
+            {collector.organization}
+          </div>
 
-                  <Link
-                    href={`/agents/${collector.id}`}
-                    className="text-muted-foreground hover:text-black transition"
-                  >
-                    <ArrowRight size={18} />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+          <div className="text-xs text-muted-foreground">
+            {collector.count} transactions
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="text-green-600 font-semibold">
+            {collector.total.toLocaleString()} €
+          </div>
+
+          <Link
+            href={`/agents/${collector.id}`}
+            className="text-muted-foreground hover:text-black transition"
+          >
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+      </div>
+    ))}
+  </CardContent>
+</Card>
 
       </div>
+
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import FilterBar from "@/components/FilterBar"
+import FilterToggle from "@/components/FilterToggle"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +37,7 @@ export default async function AgentsPage(props: {
   const offset = (page - 1) * limit
 
   // =========================
-  // FETCH TRANSACTIONS (FILTERED)
+  // FETCH TRANSACTIONS
   // =========================
 
   let query = supabase
@@ -116,7 +117,6 @@ export default async function AgentsPage(props: {
     .sort((a, b) => b.validated - a.validated)
 
   const paginatedAgents = agents.slice(offset, offset + limit)
-
   const totalPages = Math.max(1, Math.ceil(agents.length / limit))
 
   // =========================
@@ -129,7 +129,7 @@ export default async function AgentsPage(props: {
   const totalAmount = totalValidated + totalPending + totalLate
 
   // =========================
-  // CITIES (autocomplete)
+  // AUTOCOMPLETE CITIES
   // =========================
 
   const { data: citiesData } = await supabase
@@ -148,20 +148,41 @@ export default async function AgentsPage(props: {
   // =========================
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex justify-between items-start">
-        <h1 className="text-3xl font-bold">Collecteurs</h1>
-        <FilterBar cities={cities} showStatus />
-      </div>
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
+      {/* HEADER */}
+      <div className="space-y-6">
+
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Collecteurs
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Vue consolidée des collecteurs et de leurs performances
+          </p>
+        </div>
+
+        {/* Mobile filter */}
+        <div className="block xl:hidden">
+          <FilterToggle>
+            <FilterBar cities={cities} showStatus />
+          </FilterToggle>
+        </div>
+
+        {/* Desktop filter */}
+        <div className="hidden xl:block bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <FilterBar cities={cities} showStatus />
+        </div>
+
+      </div>
       {/* KPI */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Total collecté</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">
+            <div className="text-2xl font-semibold">
               {totalAmount.toLocaleString()} €
             </div>
           </CardContent>
@@ -172,7 +193,7 @@ export default async function AgentsPage(props: {
             <CardTitle>Validé</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-green-600 font-semibold">
+            <div className="text-2xl text-green-600 font-semibold">
               {totalValidated.toLocaleString()} €
             </div>
           </CardContent>
@@ -183,7 +204,7 @@ export default async function AgentsPage(props: {
             <CardTitle>En attente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-yellow-600 font-semibold">
+            <div className="text-2xl text-yellow-600 font-semibold">
               {totalPending.toLocaleString()} €
             </div>
           </CardContent>
@@ -194,7 +215,7 @@ export default async function AgentsPage(props: {
             <CardTitle>En retard</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-red-600 font-semibold">
+            <div className="text-2xl text-red-600 font-semibold">
               {totalLate.toLocaleString()} €
             </div>
           </CardContent>
@@ -202,55 +223,65 @@ export default async function AgentsPage(props: {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="p-4 text-left">Collecteur</th>
-              <th className="p-4 text-left">Organisation</th>
-              <th className="p-4 text-left">Transactions</th>
-              <th className="p-4 text-left">Validé</th>
-              <th className="p-4 text-left">En attente</th>
-              <th className="p-4 text-left">En retard</th>
-              <th className="p-4"></th>
-            </tr>
-          </thead>
+      <Card>
+        <CardContent className="p-0">
 
-          <tbody>
-            {paginatedAgents.map((a) => (
-              <tr key={a.id} className="border-b">
-                <td className="p-4 font-medium">{a.name}</td>
-                <td className="p-4">{a.organization}</td>
-                <td className="p-4">{a.totalTransactions}</td>
-                <td className="p-4 text-green-600">
-                  {a.validated.toLocaleString()} €
-                </td>
-                <td className="p-4 text-yellow-600">
-                  {a.pending.toLocaleString()} €
-                </td>
-                <td className="p-4 text-red-600">
-                  {a.late.toLocaleString()} €
-                </td>
-                <td className="p-4">
-                  <Link
-                    href={`/agents/${a.id}`}
-                    className="text-muted-foreground hover:text-black"
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="p-4 text-left">Collecteur</th>
+                  <th className="p-4 text-left">Organisation</th>
+                  <th className="p-4 text-left">Transactions</th>
+                  <th className="p-4 text-left">Validé</th>
+                  <th className="p-4 text-left">En attente</th>
+                  <th className="p-4 text-left">En retard</th>
+                  <th className="p-4"></th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {paginatedAgents.map((a) => (
+                  <tr
+                    key={a.id}
+                    className="border-b hover:bg-gray-50 transition"
                   >
-                    <ArrowRight size={18} />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* PAGINATION */}
-        <div className="flex justify-between items-center p-4 border-t bg-gray-50">
-          <div className="text-sm">
-            Page {page} / {totalPages}
+                    <td className="p-4 font-medium">{a.name}</td>
+                    <td className="p-4">{a.organization}</td>
+                    <td className="p-4">{a.totalTransactions}</td>
+                    <td className="p-4 text-green-600 font-medium">
+                      {a.validated.toLocaleString()} €
+                    </td>
+                    <td className="p-4 text-yellow-600 font-medium">
+                      {a.pending.toLocaleString()} €
+                    </td>
+                    <td className="p-4 text-red-600 font-medium">
+                      {a.late.toLocaleString()} €
+                    </td>
+                    <td className="p-4">
+                      <Link
+                        href={`/agents/${a.id}`}
+                        className="text-muted-foreground hover:text-black"
+                      >
+                        <ArrowRight size={18} />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
+
+          {/* PAGINATION */}
+          <div className="flex justify-between items-center p-4 border-t bg-gray-50 text-sm">
+            <div>
+              Page {page} / {totalPages}
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
     </div>
   )
 }

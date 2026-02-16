@@ -16,24 +16,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className="flex min-h-screen bg-gray-50">
+      <body className="h-screen overflow-hidden bg-[#f6f7f9] text-gray-900">
+        <div className="flex h-full">
+          {/* Sidebar */}
+          <Sidebar />
 
-        {/* SIDEBAR */}
-        <Sidebar />
+          {/* Main area */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Header */}
+            <Header />
 
-        {/* MAIN WRAPPER */}
-        <div className="flex-1 flex flex-col min-h-screen">
-
-          {/* HEADER GLOBAL */}
-          <Header />
-
-          {/* PAGE CONTENT */}
-          <main className="flex-1 p-8">
-            {children}
-          </main>
-
+            {/* Content (seul élément scrollable) */}
+<main className="flex-1 overflow-y-auto">
+  <div className="px-6 lg:px-8 py-8 max-w-[1400px] w-full">
+    {children}
+  </div>
+</main>
+          </div>
         </div>
-
       </body>
     </html>
   )

@@ -1,3 +1,4 @@
+// src/app/agents/[id]/page.tsx
 import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -38,8 +39,8 @@ export default async function AgentDetail(props: {
 
   if (!agent) {
     return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Collecteur introuvable</h1>
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-semibold">Collecteur introuvable</h1>
         <Link
           href="/agents"
           className="text-sm text-muted-foreground hover:text-black"
@@ -104,21 +105,19 @@ export default async function AgentDetail(props: {
   // =========================
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
       {/* BACK */}
-      <div>
-        <Link
-          href="/agents"
-          className="text-sm text-muted-foreground hover:text-black"
-        >
-          ← Retour aux collecteurs
-        </Link>
-      </div>
+      <Link
+        href="/agents"
+        className="text-sm text-muted-foreground hover:text-black"
+      >
+        ← Retour aux collecteurs
+      </Link>
 
       {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold">
+      <div className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
           {agent.first_name} {agent.last_name}
         </h1>
         <div className="text-sm text-muted-foreground">
@@ -130,13 +129,13 @@ export default async function AgentDetail(props: {
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Total collecté</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">
+            <div className="text-2xl font-semibold tracking-tight">
               {total.toLocaleString()} €
             </div>
           </CardContent>
@@ -147,7 +146,7 @@ export default async function AgentDetail(props: {
             <CardTitle>Validé</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-green-600 font-semibold">
+            <div className="text-2xl text-green-600 font-semibold">
               {validated.toLocaleString()} €
             </div>
           </CardContent>
@@ -158,7 +157,7 @@ export default async function AgentDetail(props: {
             <CardTitle>En attente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-yellow-600 font-semibold">
+            <div className="text-2xl text-yellow-600 font-semibold">
               {pending.toLocaleString()} €
             </div>
           </CardContent>
@@ -169,7 +168,7 @@ export default async function AgentDetail(props: {
             <CardTitle>En retard</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl text-red-600 font-semibold">
+            <div className="text-2xl text-red-600 font-semibold">
               {late.toLocaleString()} €
             </div>
           </CardContent>
@@ -183,64 +182,73 @@ export default async function AgentDetail(props: {
         </CardHeader>
 
         <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="p-4 text-left">Transaction</th>
-                <th className="p-4 text-left">Statut</th>
-                <th className="p-4 text-left">Montant</th>
-                <th className="p-4"></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {(transactions ?? []).map((tx: any) => (
-                <tr key={tx.id_transaction} className="border-b">
-                  <td className="p-4">
-                    <div className="font-medium">
-                      {tx.type_details ?? "—"} —{" "}
-                      {tx.companies?.company_name ?? "—"}
-                    </div>
-
-                    <div className="text-xs text-muted-foreground">
-                      Notifiée le : {tx.created_at?.slice(0, 10)}
-                    </div>
-
-                    <div className="text-xs text-muted-foreground">
-                      Due le : {tx.due_date ?? "—"}
-                    </div>
-
-                    <div className="text-xs text-muted-foreground">
-                      Directeur :{" "}
-                      {tx.directors
-                        ? `${tx.directors.first_name} ${tx.directors.last_name}`
-                        : "—"}
-                    </div>
-                  </td>
-
-                  <td className="p-4">
-                    <StatusBadge status={tx.status} />
-                  </td>
-
-                  <td className="p-4 font-semibold">
-                    {Number(tx.amount).toLocaleString()} €
-                  </td>
-
-                  <td className="p-4">
-                    <Link
-                      href={`/transactions/${tx.id_transaction}`}
-                      className="text-muted-foreground hover:text-black"
-                    >
-                      <ArrowRight size={18} />
-                    </Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[750px]">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="p-4 text-left">Transaction</th>
+                  <th className="p-4 text-left">Statut</th>
+                  <th className="p-4 text-left">Montant</th>
+                  <th className="p-4"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {(transactions ?? []).length > 0 ? (
+                  (transactions ?? []).map((tx: any) => (
+                    <tr key={tx.id_transaction} className="border-b last:border-b-0">
+                      <td className="p-4">
+                        <div className="font-medium">
+                          {tx.type_details ?? "—"} —{" "}
+                          {tx.companies?.company_name ?? "—"}
+                        </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          Notifiée le : {tx.created_at?.slice(0, 10)}
+                        </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          Due le : {tx.due_date ?? "—"}
+                        </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          Directeur :{" "}
+                          {tx.directors
+                            ? `${tx.directors.first_name} ${tx.directors.last_name}`
+                            : "—"}
+                        </div>
+                      </td>
+
+                      <td className="p-4">
+                        <StatusBadge status={tx.status} />
+                      </td>
+
+                      <td className="p-4 font-semibold">
+                        {Number(tx.amount).toLocaleString()} €
+                      </td>
+
+                      <td className="p-4">
+                        <Link
+                          href={`/transactions/${tx.id_transaction}`}
+                          className="text-muted-foreground hover:text-black transition"
+                        >
+                          <ArrowRight size={18} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="p-4 text-muted-foreground" colSpan={4}>
+                      —
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
-
     </div>
   )
 }
