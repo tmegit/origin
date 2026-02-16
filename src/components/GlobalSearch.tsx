@@ -10,10 +10,15 @@ type ResultItem =
   | { type: "transaction"; id: string; label: string }
 
 function isUuid(v: string) {
-  // uuid v4-ish, mais on accepte large
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    v.trim()
-  )
+  return /^[0-9a-f-]{36}$/i.test(v.trim())
+}
+
+function splitTerms(q: string) {
+  return q
+    .trim()
+    .split(/\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
 }
 
 export default function GlobalSearch() {
@@ -33,140 +38,133 @@ export default function GlobalSearch() {
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState<string | null>(null)
 
-  // petit debounce
   useEffect(() => {
     const q = query.trim()
+
     if (q.length < 2) {
       setResults([])
       setErrMsg(null)
       return
     }
 
-    const t = setTimeout(() => {
+    const timeout = setTimeout(() => {
       void runSearch(q)
-    }, 250)
+    }, 300)
 
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => clearTimeout(timeout)
   }, [query])
 
   async function runSearch(q: string) {
-    setLoading(true)
-    setErrMsg(null)
+    try {
+      setLoading(true)
+      setErrMsg(null)
 
-    const qIsUuid = isUuid(q)
+      const qIsUuid = isUuid(q)
+      const terms = splitTerms(q)
 
-    // ------------------------
-    // ENTREPRISES
-    // ------------------------
-    const [companiesByNameRes, companiesByIdRes] = await Promise.all([
-      supabase
+      // =========================
+      // ENTREPRISES
+      // =========================
+      const companiesQuery = supabase
         .from("companies")
         .select("id_temp, company_name")
-        .ilike("company_name", `%${q}%`)
-        .limit(5),
-      qIsUuid
-        ? supabase
-            .from("companies")
-            .select("id_temp, company_name")
-            .eq("id_temp", q)
-            .limit(1)
-        : Promise.resolve({ data: [], error: null } as any),
-    ])
+        .limit(5)
 
-    // ------------------------
-    // DIRECTEURS
-    // ------------------------
-    const [directorsByNameRes, directorsByIdRes] = await Promise.all([
-      supabase
+      const companiesRes = qIsUuid
+        ? await companiesQuery.eq("id_temp", q)
+        : await companiesQuery.ilike("company_name", `%${q}%`)
+
+      // =========================
+      // DIRECTEURS (IMPORTANT: multi-termes)
+      // =========================
+      const directorsQuery = supabase
         .from("directors")
         .select("id_director, first_name, last_name")
-        .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
-        .limit(5),
-      qIsUuid
-        ? supabase
-            .from("directors")
-            .select("id_director, first_name, last_name")
-            .eq("id_director", q)
-            .limit(1)
-        : Promise.resolve({ data: [], error: null } as any),
-    ])
+        .limit(5)
 
-    // ------------------------
-    // TRANSACTIONS
-    // ------------------------
-    const [txByTextRes, txByIdRes] = await Promise.all([
-      supabase
+      let directorsRes:
+        | { data: any[] | null; error: any | null }
+        | undefined
+
+      if (qIsUuid) {
+        directorsRes = await directorsQuery.eq("id_director", q)
+      } else if (terms.length >= 2) {
+        const t1 = terms[0]
+        const t2 = terms.slice(1).join(" ") // support noms composés
+
+        // or(
+        //   and(first_name ilike t1, last_name ilike t2),
+        //   and(first_name ilike t2, last_name ilike t1),
+        //   first_name ilike q,
+        //   last_name ilike q
+        // )
+        directorsRes = await directorsQuery.or(
+          [
+            `and(first_name.ilike.%${t1}%,last_name.ilike.%${t2}%)`,
+            `and(first_name.ilike.%${t2}%,last_name.ilike.%${t1}%)`,
+            `first_name.ilike.%${q}%`,
+            `last_name.ilike.%${q}%`,
+          ].join(",")
+        )
+      } else {
+        // 1 seul terme : prénom OU nom
+        directorsRes = await directorsQuery.or(
+          `first_name.ilike.%${q}%,last_name.ilike.%${q}%`
+        )
+      }
+
+      // =========================
+      // TRANSACTIONS
+      // =========================
+      const transactionsQuery = supabase
         .from("transactions")
         .select("id_transaction, type_details")
-        .ilike("type_details", `%${q}%`)
-        .limit(5),
-      qIsUuid
-        ? supabase
-            .from("transactions")
-            .select("id_transaction, type_details")
-            .eq("id_transaction", q)
-            .limit(1)
-        : Promise.resolve({ data: [], error: null } as any),
-    ])
+        .limit(5)
 
-    // remonter les erreurs au lieu de les ignorer
-    const errors = [
-      companiesByNameRes.error,
-      companiesByIdRes.error,
-      directorsByNameRes.error,
-      directorsByIdRes.error,
-      txByTextRes.error,
-      txByIdRes.error,
-    ].filter(Boolean) as any[]
+      const transactionsRes = qIsUuid
+        ? await transactionsQuery.eq("id_transaction", q)
+        : await transactionsQuery.ilike("type_details", `%${q}%`)
 
-    if (errors.length > 0) {
-      setErrMsg(errors[0]?.message ?? "Erreur Supabase")
+      if (companiesRes.error) throw companiesRes.error
+      if (directorsRes?.error) throw directorsRes.error
+      if (transactionsRes.error) throw transactionsRes.error
+
+      const map = new Map<string, ResultItem>()
+
+      for (const c of companiesRes.data ?? []) {
+        map.set(`company:${c.id_temp}`, {
+          type: "company",
+          id: c.id_temp,
+          label: c.company_name || c.id_temp,
+        })
+      }
+
+      for (const d of directorsRes?.data ?? []) {
+        map.set(`director:${d.id_director}`, {
+          type: "director",
+          id: d.id_director,
+          label:
+            `${d.first_name ?? ""} ${d.last_name ?? ""}`.trim() ||
+            d.id_director,
+        })
+      }
+
+      for (const t of transactionsRes.data ?? []) {
+        map.set(`transaction:${t.id_transaction}`, {
+          type: "transaction",
+          id: t.id_transaction,
+          label: t.type_details || t.id_transaction,
+        })
+      }
+
+      setResults(Array.from(map.values()).slice(0, 12))
+    } catch (err: any) {
+      console.error("Search error:", err)
+      setErrMsg(err?.message ? String(err.message) : "Erreur lors de la recherche")
       setResults([])
+    } finally {
       setLoading(false)
-      return
     }
-
-    const companies = [
-      ...(companiesByIdRes.data ?? []),
-      ...(companiesByNameRes.data ?? []),
-    ]
-    const directors = [
-      ...(directorsByIdRes.data ?? []),
-      ...(directorsByNameRes.data ?? []),
-    ]
-    const transactions = [
-      ...(txByIdRes.data ?? []),
-      ...(txByTextRes.data ?? []),
-    ]
-
-    // dédup par (type,id)
-    const map = new Map<string, ResultItem>()
-
-    for (const c of companies) {
-      map.set(`company:${c.id_temp}`, {
-        type: "company",
-        id: c.id_temp,
-        label: c.company_name || c.id_temp,
-      })
-    }
-    for (const d of directors) {
-      map.set(`director:${d.id_director}`, {
-        type: "director",
-        id: d.id_director,
-        label: `${d.first_name ?? ""} ${d.last_name ?? ""}`.trim() || d.id_director,
-      })
-    }
-    for (const t of transactions) {
-      map.set(`transaction:${t.id_transaction}`, {
-        type: "transaction",
-        id: t.id_transaction,
-        label: t.type_details || t.id_transaction,
-      })
-    }
-
-    setResults(Array.from(map.values()).slice(0, 12))
-    setLoading(false)
   }
 
   function goTo(item: ResultItem) {
@@ -182,31 +180,22 @@ export default function GlobalSearch() {
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Rechercher rapide (nom ou ID)…"
+        placeholder="Rechercher (nom ou ID)…"
         className="w-full border rounded-lg px-4 py-2 text-sm bg-white"
       />
 
       {(loading || errMsg || results.length > 0) && (
         <div className="absolute mt-2 w-full bg-white border rounded-lg shadow-lg z-50 overflow-hidden">
           {loading && (
-            <div className="px-4 py-3 text-sm text-muted-foreground">
-              Recherche…
-            </div>
+            <div className="px-4 py-3 text-sm text-gray-500">Recherche…</div>
           )}
 
           {errMsg && !loading && (
-            <div className="px-4 py-3 text-sm text-red-600">
-              {errMsg}
-              <div className="text-xs text-muted-foreground mt-1">
-                (Regarde RLS / droits SELECT si besoin)
-              </div>
-            </div>
+            <div className="px-4 py-3 text-sm text-red-600">{errMsg}</div>
           )}
 
           {!loading && !errMsg && results.length === 0 && query.trim().length >= 2 && (
-            <div className="px-4 py-3 text-sm text-muted-foreground">
-              Aucun résultat
-            </div>
+            <div className="px-4 py-3 text-sm text-gray-500">Aucun résultat</div>
           )}
 
           {!loading &&
@@ -219,9 +208,7 @@ export default function GlobalSearch() {
                 type="button"
               >
                 <span className="font-medium">{item.label}</span>
-                <span className="ml-2 text-xs text-gray-400">
-                  ({item.type})
-                </span>
+                <span className="ml-2 text-xs text-gray-400">({item.type})</span>
               </button>
             ))}
         </div>
