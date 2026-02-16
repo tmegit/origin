@@ -3,14 +3,17 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   CreditCard,
   Building2,
   User,
   Shield,
+  LogOut,
 } from "lucide-react"
+import { createBrowserClient } from "@supabase/ssr"
+import { useState } from "react"
 
 const menu = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -22,6 +25,24 @@ const menu = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true)
+      await supabase.auth.signOut()
+      router.push("/login")
+      router.refresh()
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <aside className="w-64 h-screen bg-white border-r p-6 flex flex-col">
@@ -40,7 +61,8 @@ export default function Sidebar() {
         </div>
       </Link>
 
-      <nav className="space-y-2">
+      {/* NAVIGATION */}
+      <nav className="space-y-2 flex-1">
         {menu.map((item) => {
           const Icon = item.icon
           const isActive =
@@ -64,6 +86,18 @@ export default function Sidebar() {
           )
         })}
       </nav>
+
+      {/* LOGOUT BUTTON (bas du sidebar) */}
+      <div className="pt-6 border-t">
+        <button
+          onClick={handleLogout}
+          disabled={loading}
+          className="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 w-full transition"
+        >
+          <LogOut size={18} />
+          <span>{loading ? "Déconnexion..." : "Se déconnecter"}</span>
+        </button>
+      </div>
     </aside>
   )
 }

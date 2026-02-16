@@ -3,6 +3,7 @@ import FormalizeCompanyForm from "@/components/FormalizeCompanyForm"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import AddTransactionForm from "@/components/AddTransactionForm"
 import StatusBadge from "@/components/StatusBadge"
 import {
   ActivityStatusBadge,
@@ -164,6 +165,10 @@ export default async function CompanyDetail(props: {
         </Card>
 
       </div>
+
+      {company.company_formal_status === "formalized" && (
+  <AddTransactionForm companyId={company.id_temp} />
+)}
 
       {/* TRANSACTIONS */}
       <Card>
