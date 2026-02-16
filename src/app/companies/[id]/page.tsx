@@ -35,6 +35,8 @@ export default async function CompanyDetail(props: {
       geocode_label,
       company_formal_status,
       company_status,
+      naf_code,
+      naf_label,
       director_id,
       directors:director_id (
         id_director,
@@ -59,7 +61,7 @@ export default async function CompanyDetail(props: {
     )
   }
 
-  // ⚠️ Supabase peut retourner un array
+  // Supabase peut retourner un array
   const director = Array.isArray(company.directors)
     ? company.directors[0]
     : company.directors
@@ -118,6 +120,7 @@ export default async function CompanyDetail(props: {
             <CardTitle>Entreprise</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-6 text-sm">
+
             <div>
               <div className="text-muted-foreground">ID</div>
               <div className="font-medium">{company.id_temp}</div>
@@ -137,6 +140,17 @@ export default async function CompanyDetail(props: {
               <div className="text-muted-foreground">Activité</div>
               <ActivityStatusBadge value={company.company_status} />
             </div>
+
+            {/* ✅ NOUVEAU : Secteur NAF */}
+            <div className="col-span-2">
+              <div className="text-muted-foreground">Secteur d'activité (NAF)</div>
+              <div className="font-medium">
+                {company.naf_code
+                  ? `${company.naf_code} — ${company.naf_label}`
+                  : "—"}
+              </div>
+            </div>
+
           </CardContent>
         </Card>
 
@@ -166,9 +180,10 @@ export default async function CompanyDetail(props: {
 
       </div>
 
+      {/* AJOUT TRANSACTION */}
       {company.company_formal_status === "formalized" && (
-  <AddTransactionForm companyId={company.id_temp} />
-)}
+        <AddTransactionForm companyId={company.id_temp} />
+      )}
 
       {/* TRANSACTIONS */}
       <Card>

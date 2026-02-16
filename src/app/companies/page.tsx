@@ -1,8 +1,9 @@
 import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Plus } from "lucide-react"
 import CompaniesFilterBar from "@/components/CompaniesFilterBar"
+import CreateCompanyForm from "@/components/CreateCompanyForm"
 import {
   ActivityStatusBadge,
   FormalStatusBadge,
@@ -104,6 +105,8 @@ export default async function CompaniesPage(props: {
       geocode_label,
       company_formal_status,
       company_status,
+      naf_code,
+      naf_label,
       director_id,
       directors:director_id (
         id_director,
@@ -126,7 +129,7 @@ export default async function CompaniesPage(props: {
   const ids = (companies ?? []).map((c: any) => c.id_temp)
 
   // =========================
-  // DIRECTEURS VIA TRANSACTIONS (fallback)
+  // DIRECTEURS FALLBACK
   // =========================
 
   const directorMap: Record<
@@ -175,10 +178,6 @@ export default async function CompaniesPage(props: {
     })
   }
 
-  // =========================
-  // QUERY STRING BASE
-  // =========================
-
   const qsBase = new URLSearchParams()
   if (city) qsBase.set("city", city)
   if (formal) qsBase.set("formal", formal)
@@ -190,17 +189,20 @@ export default async function CompaniesPage(props: {
 
   return (
     <div className="p-8 space-y-8">
-      <div className="flex justify-between items-start gap-6 flex-wrap">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center flex-wrap gap-6">
         <h1 className="text-3xl font-bold">Entreprises</h1>
         <CompaniesFilterBar cities={cities} />
       </div>
 
+      {/* FORMULAIRE CREATION (Client Component sécurisé) */}
+      <CreateCompanyForm />
+
       {/* KPI */}
       <div className="grid grid-cols-4 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Total</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Total</CardTitle></CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
               {(totalCompanies ?? 0).toLocaleString()}
@@ -209,9 +211,7 @@ export default async function CompaniesPage(props: {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Formalisées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Formalisées</CardTitle></CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-green-600">
               {(formalizedCompanies ?? 0).toLocaleString()}
@@ -220,9 +220,7 @@ export default async function CompaniesPage(props: {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Détectées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Détectées</CardTitle></CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-yellow-600">
               {(detectedCompanies ?? 0).toLocaleString()}
@@ -231,9 +229,7 @@ export default async function CompaniesPage(props: {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Fermées</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Fermées</CardTitle></CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-red-600">
               {(closedCompanies ?? 0).toLocaleString()}
@@ -309,7 +305,6 @@ export default async function CompaniesPage(props: {
 
         {/* PAGINATION */}
         <div className="flex justify-between items-center p-4 border-t bg-gray-50">
-          {/* LIMIT */}
           <div className="flex gap-2 text-sm">
             {[25, 50, 100].map((l) => {
               const p = new URLSearchParams(qsBase)
@@ -331,7 +326,6 @@ export default async function CompaniesPage(props: {
             })}
           </div>
 
-          {/* NAV */}
           <div className="flex gap-2 text-sm items-center">
             {page > 1 && (
               <Link

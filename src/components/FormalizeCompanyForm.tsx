@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import { useRouter } from "next/navigation"
 
@@ -18,6 +18,7 @@ export default function FormalizeCompanyForm({
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [nafCodes, setNafCodes] = useState<any[]>([])
 
   const [form, setForm] = useState({
     first_name: "",
@@ -29,8 +30,22 @@ export default function FormalizeCompanyForm({
     phone: "",
     email: "",
     postal_address: "",
-    company_address: "", // ✅ AJOUTÉ
+    naf_code: "",
   })
+
+  // Charger NAF
+  useEffect(() => {
+    const fetchNaf = async () => {
+      const { data } = await supabase
+        .from("naf_codes")
+        .select("code, label")
+        .order("code", { ascending: true })
+
+      setNafCodes(data ?? [])
+    }
+
+    fetchNaf()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +64,7 @@ export default function FormalizeCompanyForm({
         p_phone: form.phone,
         p_email: form.email,
         p_postal_address: form.postal_address,
-        p_company_address: form.company_address, // ✅ IMPORTANT
+        p_naf_code: form.naf_code,
       }
     )
 
@@ -70,9 +85,6 @@ export default function FormalizeCompanyForm({
         <h3 className="font-semibold mb-2">
           Formaliser cette entreprise
         </h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Cette entreprise est détectée mais non formalisée.
-        </p>
         <button
           onClick={() => setOpen(true)}
           className="bg-black text-white px-4 py-2 rounded"
@@ -214,7 +226,7 @@ export default function FormalizeCompanyForm({
         </div>
       </div>
 
-      {/* Adresse dirigeant */}
+      {/* Adresse */}
       <div>
         <label className="text-sm font-medium">
           Adresse postale du dirigeant
@@ -230,20 +242,26 @@ export default function FormalizeCompanyForm({
         />
       </div>
 
-      {/* Adresse entreprise */}
+      {/* NAF */}
       <div>
         <label className="text-sm font-medium">
-          Adresse complète de l’entreprise
+          Secteur d'activité (NAF)
         </label>
-        <input
-          type="text"
+        <select
           className="w-full border px-3 py-2 rounded mt-1"
-          value={form.company_address}
+          value={form.naf_code}
           onChange={(e) =>
-            setForm({ ...form, company_address: e.target.value })
+            setForm({ ...form, naf_code: e.target.value })
           }
           required
-        />
+        >
+          <option value="">Sélectionner un code NAF</option>
+          {nafCodes.map((naf) => (
+            <option key={naf.code} value={naf.code}>
+              {naf.code} — {naf.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <button
