@@ -22,7 +22,7 @@ export default async function CompanyDetail(props: {
   const { id } = await props.params
 
   // =========================
-  // COMPANY + DIRECTOR (via companies.director_id)
+  // COMPANY + DIRECTOR
   // =========================
   const { data: company } = await supabase
     .from("companies")
@@ -48,12 +48,20 @@ export default async function CompanyDetail(props: {
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold">Entreprise introuvable</h1>
-        <Link href="/companies" className="text-sm text-muted-foreground hover:text-black">
+        <Link
+          href="/companies"
+          className="text-sm text-muted-foreground hover:text-black"
+        >
           ← Retour aux entreprises
         </Link>
       </div>
     )
   }
+
+  // ⚠️ Supabase peut retourner un array
+  const director = Array.isArray(company.directors)
+    ? company.directors[0]
+    : company.directors
 
   // =========================
   // TRANSACTIONS
@@ -73,10 +81,16 @@ export default async function CompanyDetail(props: {
 
   return (
     <div className="p-8 space-y-8">
-      <Link href="/companies" className="text-sm text-muted-foreground hover:text-black">
+
+      {/* RETOUR */}
+      <Link
+        href="/companies"
+        className="text-sm text-muted-foreground hover:text-black"
+      >
         ← Retour aux entreprises
       </Link>
 
+      {/* HEADER */}
       <div>
         <h1 className="text-3xl font-bold">
           {company.company_name ?? "[ND]"}
@@ -89,13 +103,15 @@ export default async function CompanyDetail(props: {
         </div>
       </div>
 
-      {/* FORMALISATION (si détectée) */}
+      {/* FORMALISATION */}
       {company.company_formal_status !== "formalized" && (
         <FormalizeCompanyForm companyId={company.id_temp} />
       )}
 
-      {/* INFO */}
+      {/* INFO GRID */}
       <div className="grid grid-cols-3 gap-6">
+
+        {/* ENTREPRISE */}
         <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Entreprise</CardTitle>
@@ -123,19 +139,19 @@ export default async function CompanyDetail(props: {
           </CardContent>
         </Card>
 
-        {/* DIRECTEUR PRINCIPAL */}
+        {/* DIRECTEUR */}
         <Card>
           <CardHeader>
             <CardTitle>Directeur</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {company.directors ? (
+            {director ? (
               <>
                 <div className="font-medium">
-                  {company.directors.first_name} {company.directors.last_name}
+                  {director.first_name} {director.last_name}
                 </div>
                 <Link
-                  href={`/directors/${company.directors.id_director}`}
+                  href={`/directors/${director.id_director}`}
                   className="text-sm text-blue-600 hover:underline"
                 >
                   Voir la fiche directeur →
@@ -146,6 +162,7 @@ export default async function CompanyDetail(props: {
             )}
           </CardContent>
         </Card>
+
       </div>
 
       {/* TRANSACTIONS */}
@@ -202,6 +219,7 @@ export default async function CompanyDetail(props: {
           </table>
         </CardContent>
       </Card>
+
     </div>
   )
 }
