@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import StatusBadge from "@/components/StatusBadge"
+import UpdateDirectorForm from "@/components/UpdateDirectorForm"
 
 export const dynamic = "force-dynamic"
 
@@ -20,19 +21,32 @@ export default async function DirectorDetail(props: {
   }>
 }) {
   const { id } = await props.params
-  const searchParams = await props.searchParams
+  const sp = await props.searchParams
 
-  const from = searchParams?.from
-  const to = searchParams?.to
-  const status = searchParams?.status
+  const from = sp?.from
+  const to = sp?.to
+  const status = sp?.status
 
   // =========================
   // DIRECTOR INFO
   // =========================
-
   const { data: director } = await supabase
     .from("directors")
-    .select("*")
+    .select(
+      `
+      id_director,
+      first_name,
+      last_name,
+      gender,
+      birth_date,
+      nationality,
+      phone,
+      email,
+      postal_address,
+      created_at,
+      updated_at
+    `
+    )
     .eq("id_director", id)
     .single()
 
@@ -41,21 +55,20 @@ export default async function DirectorDetail(props: {
   }
 
   // =========================
-  // ENTREPRISES DIRIGÉES
+  // ENTREPRISES DIRIGÉES (via director_companies)
   // =========================
-
-  const { data: companyIdsRows } = await supabase
-    .from("transactions")
+  const { data: directorCompaniesRows } = await supabase
+    .from("director_companies")
     .select("company_id")
     .eq("director_id", id)
 
-  const uniqueCompanyIds = [
-    ...new Set(companyIdsRows?.map((r: any) => r.company_id)),
-  ]
+  const companyIds = Array.from(
+    new Set((directorCompaniesRows ?? []).map((r: any) => r.company_id).filter(Boolean))
+  )
 
   let companies: any[] = []
 
-  if (uniqueCompanyIds.length > 0) {
+  if (companyIds.length > 0) {
     const { data } = await supabase
       .from("companies")
       .select(`
@@ -66,7 +79,8 @@ export default async function DirectorDetail(props: {
         company_formal_status,
         company_status
       `)
-      .in("id_temp", uniqueCompanyIds)
+      .in("id_temp", companyIds)
+      .order("company_name", { ascending: true })
 
     companies = data ?? []
   }
@@ -74,7 +88,6 @@ export default async function DirectorDetail(props: {
   // =========================
   // TRANSACTIONS FILTRÉES
   // =========================
-
   let txQuery = supabase
     .from("transactions")
     .select(`
@@ -102,15 +115,15 @@ export default async function DirectorDetail(props: {
   // =========================
   // KPI
   // =========================
-
   let lateAmount = 0
   let pendingAmount = 0
   let validatedAmount = 0
 
-  transactions?.forEach((tx: any) => {
-    if (tx.status === "late") lateAmount += Number(tx.amount)
-    if (tx.status === "pending") pendingAmount += Number(tx.amount)
-    if (tx.status === "validated") validatedAmount += Number(tx.amount)
+  ;(transactions ?? []).forEach((tx: any) => {
+    const amt = Number(tx.amount) || 0
+    if (tx.status === "late") lateAmount += amt
+    if (tx.status === "pending") pendingAmount += amt
+    if (tx.status === "validated") validatedAmount += amt
   })
 
   const totalAmount = lateAmount + pendingAmount + validatedAmount
@@ -118,10 +131,8 @@ export default async function DirectorDetail(props: {
   // =========================
   // RENDER
   // =========================
-
   return (
     <div className="p-8 space-y-8">
-
       {/* RETOUR */}
       <Link
         href="/directors"
@@ -140,10 +151,52 @@ export default async function DirectorDetail(props: {
         </div>
       </div>
 
+      {/* INFOS DIRECTEUR */}
+<Card>
+  <CardHeader className="flex flex-row items-center justify-between">
+    <CardTitle>Informations</CardTitle>
+    <UpdateDirectorForm director={director} />
+  </CardHeader>
+
+  <CardContent className="grid grid-cols-2 gap-6 text-sm">
+    <div>
+      <div className="text-muted-foreground">Genre</div>
+      <div>{director.gender ?? "—"}</div>
+    </div>
+
+    <div>
+      <div className="text-muted-foreground">Date de naissance</div>
+      <div>{director.birth_date ?? "—"}</div>
+    </div>
+
+    <div>
+      <div className="text-muted-foreground">Nationalité</div>
+      <div>{director.nationality ?? "—"}</div>
+    </div>
+
+    <div>
+      <div className="text-muted-foreground">Téléphone</div>
+      <div>{director.phone ?? "—"}</div>
+    </div>
+
+    <div>
+      <div className="text-muted-foreground">Email</div>
+      <div>{director.email ?? "—"}</div>
+    </div>
+
+    <div>
+      <div className="text-muted-foreground">Adresse</div>
+      <div>{director.postal_address ?? "—"}</div>
+    </div>
+  </CardContent>
+</Card>
+
       {/* KPI */}
       <div className="grid grid-cols-4 gap-6">
         <Card>
-          <CardHeader><CardTitle>Total</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Total</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
               {totalAmount.toLocaleString()} €
@@ -152,7 +205,9 @@ export default async function DirectorDetail(props: {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>En retard</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>En retard</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-3xl text-red-600 font-semibold">
               {lateAmount.toLocaleString()} €
@@ -161,7 +216,9 @@ export default async function DirectorDetail(props: {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>En attente</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>En attente</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-3xl text-yellow-500 font-semibold">
               {pendingAmount.toLocaleString()} €
@@ -170,7 +227,9 @@ export default async function DirectorDetail(props: {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Validé</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Validé</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-3xl text-green-600 font-semibold">
               {validatedAmount.toLocaleString()} €
@@ -197,62 +256,69 @@ export default async function DirectorDetail(props: {
             </thead>
 
             <tbody>
-              {companies.map((company: any) => {
-                const isOpen =
-                  company.company_status &&
-                  company.company_status.toLowerCase() === "open"
+              {companies.length > 0 ? (
+                companies.map((company: any) => {
+                  const status = (company.company_status ?? "").toString().toLowerCase()
+                  const isOpen = status === "open"
 
-                return (
-                  <tr key={company.id_temp} className="border-b">
-                    <td className="p-4">
-                      <div className="font-medium">
-                        {company.company_name}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {company.id_temp}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {company.geocode_label ?? company.geo_name}
-                      </div>
-                    </td>
+                  return (
+                    <tr key={company.id_temp} className="border-b">
+                      <td className="p-4">
+                        <div className="font-medium">
+                          {company.company_name ?? "[ND]"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {company.id_temp}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {company.geocode_label ?? company.geo_name ?? "—"}
+                        </div>
+                      </td>
 
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          company.company_formal_status === "formalized"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {company.company_formal_status === "formalized"
-                          ? "Formalisée"
-                          : "Détectée"}
-                      </span>
-                    </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            company.company_formal_status === "formalized"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {company.company_formal_status === "formalized"
+                            ? "Formalisée"
+                            : "Détectée"}
+                        </span>
+                      </td>
 
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          isOpen
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {isOpen ? "Ouverte" : "Fermée"}
-                      </span>
-                    </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            isOpen
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {isOpen ? "Ouverte" : "Fermée"}
+                        </span>
+                      </td>
 
-                    <td className="p-4">
-                      <Link
-                        href={`/companies/${company.id_temp}`}
-                        className="text-muted-foreground hover:text-black"
-                      >
-                        <ArrowRight size={18} />
-                      </Link>
-                    </td>
-                  </tr>
-                )
-              })}
+                      <td className="p-4">
+                        <Link
+                          href={`/companies/${company.id_temp}`}
+                          className="text-muted-foreground hover:text-black"
+                        >
+                          <ArrowRight size={18} />
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td className="p-4 text-muted-foreground" colSpan={4}>
+                    —
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>
@@ -276,43 +342,50 @@ export default async function DirectorDetail(props: {
             </thead>
 
             <tbody>
-              {transactions?.map((tx: any) => (
-                <tr key={tx.id_transaction} className="border-b">
-                  <td className="p-4">
-                    <div className="font-medium">
-                      {tx.type_details} — {tx.companies?.company_name}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Notifiée le : {tx.created_at?.slice(0, 10)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Due le : {tx.due_date}
-                    </div>
-                  </td>
+              {(transactions ?? []).length > 0 ? (
+                (transactions ?? []).map((tx: any) => (
+                  <tr key={tx.id_transaction} className="border-b">
+                    <td className="p-4">
+                      <div className="font-medium">
+                        {tx.type_details ?? "—"} — {tx.companies?.company_name ?? "—"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Notifiée le : {tx.created_at?.slice(0, 10) ?? "—"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Due le : {tx.due_date ?? "—"}
+                      </div>
+                    </td>
 
-                  <td className="p-4">
-                    <StatusBadge status={tx.status} />
-                  </td>
+                    <td className="p-4">
+                      <StatusBadge status={tx.status} />
+                    </td>
 
-                  <td className="p-4 font-semibold">
-                    {Number(tx.amount).toLocaleString()} €
-                  </td>
+                    <td className="p-4 font-semibold">
+                      {(Number(tx.amount) || 0).toLocaleString()} €
+                    </td>
 
-                  <td className="p-4">
-                    <Link
-                      href={`/transactions/${tx.id_transaction}`}
-                      className="text-muted-foreground hover:text-black"
-                    >
-                      <ArrowRight size={18} />
-                    </Link>
+                    <td className="p-4">
+                      <Link
+                        href={`/transactions/${tx.id_transaction}`}
+                        className="text-muted-foreground hover:text-black"
+                      >
+                        <ArrowRight size={18} />
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="p-4 text-muted-foreground" colSpan={4}>
+                    —
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </CardContent>
       </Card>
-
     </div>
   )
 }
