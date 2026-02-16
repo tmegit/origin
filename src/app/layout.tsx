@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 import "./globals.css"
 import Sidebar from "@/components/Sidebar"
+import Header from "@/components/Header"
 
 export const metadata = {
   icons: {
@@ -16,11 +17,23 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="flex min-h-screen bg-gray-50">
+
+        {/* SIDEBAR */}
         <Sidebar />
 
-        <main className="flex-1 p-8">
-          {children}
-        </main>
+        {/* MAIN WRAPPER */}
+        <div className="flex-1 flex flex-col min-h-screen">
+
+          {/* HEADER GLOBAL */}
+          <Header />
+
+          {/* PAGE CONTENT */}
+          <main className="flex-1 p-8">
+            {children}
+          </main>
+
+        </div>
+
       </body>
     </html>
   )
