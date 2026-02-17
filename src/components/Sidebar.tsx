@@ -12,6 +12,7 @@ import {
   Shield,
   LogOut,
   X,
+  Video, // ✅ ajouté
 } from "lucide-react"
 import { createBrowserClient } from "@supabase/ssr"
 import { useState } from "react"
@@ -45,6 +46,10 @@ export default function Sidebar() {
       setLoading(false)
     }
   }
+
+  const isDetectionActive =
+    pathname === "/detection" ||
+    pathname.startsWith("/detection/")
 
   return (
     <>
@@ -127,6 +132,25 @@ export default function Sidebar() {
             )
           })}
         </nav>
+
+        {/* ===== DETECTION BUTTON (DEMO) ===== */}
+        <div className="pt-4">
+          <Link
+            href="/detection"
+            onClick={() => setIsOpen(false)}
+            className={`
+              flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all
+              ${
+                isDetectionActive
+                  ? "bg-gray-900 text-white shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
+            `}
+          >
+            <Video size={16} />
+            <span className="font-medium">Détection</span>
+          </Link>
+        </div>
 
         {/* ===== LOGOUT ===== */}
         <div className="pt-6 border-t border-gray-200">
