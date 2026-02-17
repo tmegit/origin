@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import StatusBadge from "@/components/StatusBadge"
+import MarkAsPaidForm from "@/components/MarkAsPaidForm"
 
 export const dynamic = "force-dynamic"
 
@@ -123,6 +124,13 @@ export default async function TransactionDetail({
               </div>
             </div>
 
+            {/* 🔵 BOUTON PAIEMENT (ajout propre, responsive) */}
+            {(tx.status === "pending" || tx.status === "late") && (
+              <div className="pt-2">
+                <MarkAsPaidForm transactionId={tx.id_transaction} />
+              </div>
+            )}
+
             {/* META GRID */}
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
 
@@ -178,7 +186,7 @@ export default async function TransactionDetail({
           </CardContent>
         </Card>
 
-        {/* RIGHT COLUMN (STACKED MOBILE) */}
+        {/* RIGHT COLUMN */}
         <div className="space-y-6">
 
           {/* ENTREPRISE */}
