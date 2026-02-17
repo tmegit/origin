@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
 import FormalizeCompanyForm from "@/components/FormalizeCompanyForm"
+
+export const metadata: Metadata = { title: "Entreprise" }
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"

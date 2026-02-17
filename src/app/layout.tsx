@@ -4,6 +4,10 @@ import Sidebar from "@/components/Sidebar"
 import Header from "@/components/Header"
 
 export const metadata = {
+  title: {
+    default: "Origin",
+    template: "Origin - %s",
+  },
   icons: {
     icon: "/icon.svg",
   },

@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const metadata: Metadata = { title: "Transaction" }
 import Link from "next/link"
 import StatusBadge from "@/components/StatusBadge"
 import MarkAsPaidForm from "@/components/MarkAsPaidForm"

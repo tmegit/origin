@@ -8,6 +8,8 @@ import FilterToggle from "@/components/FilterToggle"
 
 export const dynamic = "force-dynamic"
 
+export const metadata = { title: "Transactions" }
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

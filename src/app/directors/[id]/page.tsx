@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const metadata: Metadata = { title: "Dirigeant" }
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import StatusBadge from "@/components/StatusBadge"

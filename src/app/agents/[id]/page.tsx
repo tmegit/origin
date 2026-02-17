@@ -1,5 +1,8 @@
 // src/app/agents/[id]/page.tsx
+import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
+
+export const metadata: Metadata = { title: "Agent" }
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
