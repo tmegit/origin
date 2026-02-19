@@ -80,6 +80,17 @@
       text-decoration: none; transition: color .15s; letter-spacing: .01em;
     }
     .nav-links a:hover { color: var(--c-text); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .lang-switcher { display: flex; align-items: center; gap: 4px; }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: .75rem; font-weight: 600; color: var(--c-muted);
+      padding: 3px 7px; border-radius: 3px; font-family: inherit;
+      letter-spacing: .04em; transition: color .15s;
+    }
+    .lang-btn:hover { color: var(--c-text); }
+    .lang-btn.active { color: var(--c-accent); }
+    .lang-sep { font-size: .65rem; color: var(--c-border); user-select: none; }
     .nav-cta {
       background: var(--c-accent); color: #fff;
       padding: 8px 18px; border-radius: 5px;
@@ -480,14 +491,21 @@
       <span class="logo-sov">The Sov </span><span class="logo-origin">Origin<span class="logo-dot">.</span></span>
     </a>
     <ul class="nav-links">
-      <li><a href="#problem">Le défi</a></li>
-      <li><a href="#solution">La plateforme</a></li>
-      <li><a href="#profiles">Votre situation</a></li>
-      <li><a href="#impact">Impact</a></li>
-      <li><a href="#cta">Contact</a></li>
+      <li><a href="#problem" data-t="nav.challenge">Le défi</a></li>
+      <li><a href="#solution" data-t="nav.platform">La plateforme</a></li>
+      <li><a href="#profiles" data-t="nav.profiles">Votre situation</a></li>
+      <li><a href="#impact" data-t="nav.impact">Impact</a></li>
+      <li><a href="#cta" data-t="nav.contact">Contact</a></li>
     </ul>
-    <a class="nav-cta" href="#cta">Demander une démo</a>
-    <a class="nav-mobile-cta" href="#cta">Démo</a>
+    <div class="nav-right">
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="fr">FR</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <a class="nav-cta" href="#cta" data-t="nav.cta">Demander une démo</a>
+    </div>
+    <a class="nav-mobile-cta" href="#cta" data-t="nav.cta-mobile">Démo</a>
   </div>
 </nav>
 
@@ -495,29 +513,29 @@
 <section id="hero">
   <div class="container hero-content">
     <div class="hero-eyebrow">
-      <span class="badge">Intelligence territoriale</span>
+      <span class="badge" data-t="hero.badge">Intelligence territoriale</span>
     </div>
-    <h1>Voyez, comprenez et gouvernez<br/><em>votre économie en temps réel</em></h1>
-    <p class="hero-sub">
+    <h1 data-th="hero.h1">Voyez, comprenez et gouvernez<br/><em>votre économie en temps réel</em></h1>
+    <p class="hero-sub" data-t="hero.sub">
       Origin cartographie l'intégralité de l'activité économique d'un territoire par IA. Une donnée de terrain fiable, continue et exploitable, pour toute administration qui décide sur son économie.
     </p>
     <div class="hero-actions">
-      <a class="btn-primary" href="#cta">Demander une démonstration</a>
-      <a class="btn-ghost" href="#solution">Découvrir la plateforme →</a>
+      <a class="btn-primary" href="#cta" data-t="hero.btn-primary">Demander une démonstration</a>
+      <a class="btn-ghost" href="#solution" data-t="hero.btn-ghost">Découvrir la plateforme →</a>
     </div>
 
     <div class="hero-stats">
       <div class="stat-item">
         <span class="stat-num gold">30–70%</span>
-        <div class="stat-label">de l'activité économique réelle absente des registres officiels dans la plupart des pays</div>
+        <div class="stat-label" data-t="hero.stat1-label">de l'activité économique réelle absente des registres officiels dans la plupart des pays</div>
       </div>
       <div class="stat-item">
-        <span class="stat-num green">×4,5</span>
-        <div class="stat-label">plus rapide que le recensement manuel, à une fraction du coût</div>
+        <span class="stat-num green" data-t="hero.stat2-num">×4,5</span>
+        <div class="stat-label" data-t="hero.stat2-label">plus rapide que le recensement manuel, à une fraction du coût</div>
       </div>
       <div class="stat-item">
         <span class="stat-num blue">90%</span>
-        <div class="stat-label">de précision de détection et géolocalisation des établissements par IA</div>
+        <div class="stat-label" data-t="hero.stat3-label">de précision de détection et géolocalisation des établissements par IA</div>
       </div>
     </div>
   </div>
@@ -526,19 +544,19 @@
 <!-- ─── SCREENSHOT DASHBOARD ──────────────────────── -->
 <section id="screenshot">
   <div class="container">
-    <div class="screenshot-label">Le tableau de bord Origin</div>
+    <div class="screenshot-label" data-t="screenshot.label">Le tableau de bord Origin</div>
     <div class="screenshot-frame">
       <div class="screenshot-topbar">
         <div class="dp-dot" style="background:#fca5a5;"></div>
         <div class="dp-dot" style="background:#fcd34d;"></div>
         <div class="dp-dot" style="background:#6ee7b7;"></div>
-        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Intelligence territoriale</span>
+        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;" data-t="screenshot.topbar">Origin · Intelligence territoriale</span>
       </div>
-      <img src="/dashboard-screenshot.png" alt="Tableau de bord Origin"
+      <img src="/dashboard-screenshot.png" data-alt="screenshot.alt" alt="Tableau de bord Origin"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
       <div class="screenshot-placeholder" style="display:none;">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>Déposer <code>dashboard-screenshot.png</code> dans <code>/public/</code></span>
+        <span data-th="screenshot.placeholder">Déposer <code>dashboard-screenshot.png</code> dans <code>/public/</code></span>
       </div>
     </div>
   </div>
@@ -548,41 +566,41 @@
 <section id="problem">
   <div class="container">
     <div class="section-header">
-      <span class="badge">Le défi universel</span>
-      <h2>On ne gouverne pas ce qu'on ne voit pas</h2>
-      <p class="section-sub">Quel que soit le niveau de maturité de votre administration, la question de fond est identique : disposez-vous d'une image fidèle et à jour de l'activité économique sur votre territoire ?</p>
+      <span class="badge" data-t="problem.badge">Le défi universel</span>
+      <h2 data-t="problem.h2">On ne gouverne pas ce qu'on ne voit pas</h2>
+      <p class="section-sub" data-t="problem.sub">Quel que soit le niveau de maturité de votre administration, la question de fond est identique : disposez-vous d'une image fidèle et à jour de l'activité économique sur votre territoire ?</p>
     </div>
 
     <div class="problem-grid">
       <div class="problem-visual">
-        <div class="pv-title">Part de l'activité économique visible par les administrations (estimations)</div>
+        <div class="pv-title" data-t="problem.visual-title">Part de l'activité économique visible par les administrations (estimations)</div>
         <div class="pv-bar-row">
-          <div class="pv-bar-label">Commerce</div>
+          <div class="pv-bar-label" data-t="problem.bar1">Commerce</div>
           <div class="pv-bar-track"><div class="pv-bar-fill" style="width:24%; background:#ef4444;"></div></div>
           <div class="pv-bar-val">24%</div>
         </div>
         <div class="pv-bar-row">
-          <div class="pv-bar-label">Restauration</div>
+          <div class="pv-bar-label" data-t="problem.bar2">Restauration</div>
           <div class="pv-bar-track"><div class="pv-bar-fill" style="width:18%; background:#ef4444;"></div></div>
           <div class="pv-bar-val">18%</div>
         </div>
         <div class="pv-bar-row">
-          <div class="pv-bar-label">Artisanat</div>
+          <div class="pv-bar-label" data-t="problem.bar3">Artisanat</div>
           <div class="pv-bar-track"><div class="pv-bar-fill" style="width:14%; background:#ef4444;"></div></div>
           <div class="pv-bar-val">14%</div>
         </div>
         <div class="pv-bar-row">
-          <div class="pv-bar-label">Transport</div>
+          <div class="pv-bar-label" data-t="problem.bar4">Transport</div>
           <div class="pv-bar-track"><div class="pv-bar-fill" style="width:31%; background:#f59e0b;"></div></div>
           <div class="pv-bar-val">31%</div>
         </div>
         <div class="pv-bar-row">
-          <div class="pv-bar-label">Services</div>
+          <div class="pv-bar-label" data-t="problem.bar5">Services</div>
           <div class="pv-bar-track"><div class="pv-bar-fill" style="width:38%; background:#f59e0b;"></div></div>
           <div class="pv-bar-val">38%</div>
         </div>
         <div class="pv-callout">
-          <p>⚠ En moyenne, moins d'un établissement sur trois est connu de l'administration dans les pays à économie mixte ou en développement.</p>
+          <p data-t="problem.callout">⚠ En moyenne, moins d'un établissement sur trois est connu de l'administration dans les pays à économie mixte ou en développement.</p>
         </div>
       </div>
 
@@ -590,22 +608,22 @@
         <div class="problem-point">
           <div class="pp-icon red">🔍</div>
           <div>
-            <div class="pp-title">Une activité économique largement invisible</div>
-            <div class="pp-desc">Des milliers d'établissements (boutiques, ateliers, prestataires de services) opèrent sans avoir jamais été recensés. Ils n'existent dans aucune base de données publique.</div>
+            <div class="pp-title" data-t="problem.pp1-title">Une activité économique largement invisible</div>
+            <div class="pp-desc" data-t="problem.pp1-desc">Des milliers d'établissements (boutiques, ateliers, prestataires de services) opèrent sans avoir jamais été recensés. Ils n'existent dans aucune base de données publique.</div>
           </div>
         </div>
         <div class="problem-point">
           <div class="pp-icon amber">📋</div>
           <div>
-            <div class="pp-title">Des registres figés dans le temps</div>
-            <div class="pp-desc">Les recensements manuels sont ponctuels, coûteux et rapidement obsolètes. L'image que votre administration a de son territoire peut avoir plusieurs années de retard.</div>
+            <div class="pp-title" data-t="problem.pp2-title">Des registres figés dans le temps</div>
+            <div class="pp-desc" data-t="problem.pp2-desc">Les recensements manuels sont ponctuels, coûteux et rapidement obsolètes. L'image que votre administration a de son territoire peut avoir plusieurs années de retard.</div>
           </div>
         </div>
         <div class="problem-point">
           <div class="pp-icon purple">🏛️</div>
           <div>
-            <div class="pp-title">Des décisions sans données fiables</div>
-            <div class="pp-desc">Politique économique, fiscalité, urbanisme, planification des services publics : chaque décision prise sans cartographie précise repose sur des hypothèses, pas sur des faits.</div>
+            <div class="pp-title" data-t="problem.pp3-title">Des décisions sans données fiables</div>
+            <div class="pp-desc" data-t="problem.pp3-desc">Politique économique, fiscalité, urbanisme, planification des services publics : chaque décision prise sans cartographie précise repose sur des hypothèses, pas sur des faits.</div>
           </div>
         </div>
       </div>
@@ -617,53 +635,53 @@
 <section id="solution">
   <div class="container">
     <div class="section-header">
-      <span class="badge">La plateforme</span>
-      <h2>De la rue à la décision : un cycle continu</h2>
-      <p class="section-sub">Origin transforme les données de terrain en intelligence territoriale exploitable. La fiscalité est l'une des applications possibles ; la visibilité économique est le fondement.</p>
+      <span class="badge" data-t="solution.badge">La plateforme</span>
+      <h2 data-t="solution.h2">De la rue à la décision : un cycle continu</h2>
+      <p class="section-sub" data-t="solution.sub">Origin transforme les données de terrain en intelligence territoriale exploitable. La fiscalité est l'une des applications possibles ; la visibilité économique est le fondement.</p>
     </div>
 
     <div class="solution-grid">
       <div class="sol-card">
-        <div class="sol-number">Couche 01</div>
+        <div class="sol-number">Layer 01</div>
         <span class="sol-icon">📷</span>
-        <div class="sol-title">Détection terrain par IA embarquée</div>
-        <div class="sol-desc">Un véhicule équipé d'une caméra parcourt le territoire. Notre modèle de vision identifie et géolocalise automatiquement chaque établissement (enseignes, secteur, type d'activité) à 90% de précision.</div>
-        <span class="sol-tag">Vision par ordinateur · OCR · Géocodage</span>
+        <div class="sol-title" data-t="sol.01-title">Détection terrain par IA embarquée</div>
+        <div class="sol-desc" data-t="sol.01-desc">Un véhicule équipé d'une caméra parcourt le territoire. Notre modèle de vision identifie et géolocalise automatiquement chaque établissement (enseignes, secteur, type d'activité) à 90% de précision.</div>
+        <span class="sol-tag" data-t="sol.01-tag">Vision par ordinateur · OCR · Géocodage</span>
       </div>
       <div class="sol-card">
-        <div class="sol-number">Couche 02</div>
+        <div class="sol-number">Layer 02</div>
         <span class="sol-icon">🗺️</span>
-        <div class="sol-title">Registre territorial en temps réel</div>
-        <div class="sol-desc">Chaque établissement détecté est versé dans un registre structuré avec ses coordonnées GPS, son secteur d'activité, son statut et son historique. Une base de données vivante, mise à jour en continu.</div>
-        <span class="sol-tag">Base de données · Cartographie · Enrichissement</span>
+        <div class="sol-title" data-t="sol.02-title">Registre territorial en temps réel</div>
+        <div class="sol-desc" data-t="sol.02-desc">Chaque établissement détecté est versé dans un registre structuré avec ses coordonnées GPS, son secteur d'activité, son statut et son historique. Une base de données vivante, mise à jour en continu.</div>
+        <span class="sol-tag" data-t="sol.02-tag">Base de données · Cartographie · Enrichissement</span>
       </div>
       <div class="sol-card">
-        <div class="sol-number">Couche 03</div>
+        <div class="sol-number">Layer 03</div>
         <span class="sol-icon">👤</span>
-        <div class="sol-title">Identification des opérateurs économiques</div>
-        <div class="sol-desc">Associez chaque établissement à son responsable. Consolidez les profils multi-sites. Constituez un annuaire des acteurs économiques de votre territoire, utilisable pour n'importe quelle politique publique.</div>
-        <span class="sol-tag">KYC · Consolidation · Suivi des acteurs</span>
+        <div class="sol-title" data-t="sol.03-title">Identification des opérateurs économiques</div>
+        <div class="sol-desc" data-t="sol.03-desc">Associez chaque établissement à son responsable. Consolidez les profils multi-sites. Constituez un annuaire des acteurs économiques de votre territoire, utilisable pour n'importe quelle politique publique.</div>
+        <span class="sol-tag" data-t="sol.03-tag">KYC · Consolidation · Suivi des acteurs</span>
       </div>
       <div class="sol-card">
-        <div class="sol-number">Couche 04</div>
+        <div class="sol-number">Layer 04</div>
         <span class="sol-icon">📊</span>
-        <div class="sol-title">Tableau de bord décisionnel</div>
-        <div class="sol-desc">Une vue synthétique et géographique de l'activité économique de votre territoire : densité sectorielle, évolution dans le temps, zones d'activité, indicateurs personnalisables selon vos priorités.</div>
-        <span class="sol-tag">Analytics · Cartographie · Reporting</span>
+        <div class="sol-title" data-t="sol.04-title">Tableau de bord décisionnel</div>
+        <div class="sol-desc" data-t="sol.04-desc">Une vue synthétique et géographique de l'activité économique de votre territoire : densité sectorielle, évolution dans le temps, zones d'activité, indicateurs personnalisables selon vos priorités.</div>
+        <span class="sol-tag" data-t="sol.04-tag">Analytics · Cartographie · Reporting</span>
       </div>
       <div class="sol-card">
-        <div class="sol-number">Couche 05</div>
+        <div class="sol-number">Layer 05</div>
         <span class="sol-icon">⚙️</span>
-        <div class="sol-title">Module de gestion fiscale (optionnel)</div>
-        <div class="sol-desc">Pour les administrations qui souhaitent aller jusqu'à la collecte : affectation d'obligations, pilotage des agents terrain, suivi des paiements et des retards, recouvrement structuré.</div>
-        <span class="sol-tag">Collecte · Agents · Recouvrement</span>
+        <div class="sol-title" data-t="sol.05-title">Module de gestion fiscale (optionnel)</div>
+        <div class="sol-desc" data-t="sol.05-desc">Pour les administrations qui souhaitent aller jusqu'à la collecte : affectation d'obligations, pilotage des agents terrain, suivi des paiements et des retards, recouvrement structuré.</div>
+        <span class="sol-tag" data-t="sol.05-tag">Collecte · Agents · Recouvrement</span>
       </div>
       <div class="sol-card">
-        <div class="sol-number">Couche 06</div>
+        <div class="sol-number">Layer 06</div>
         <span class="sol-icon">🔗</span>
-        <div class="sol-title">Intégration avec vos systèmes existants</div>
-        <div class="sol-desc">Origin s'intègre via API avec votre système fiscal, votre ERP ou vos outils métier actuels. Il enrichit et complète l'existant, sans le remplacer.</div>
-        <span class="sol-tag">API REST · Interopérabilité · Personnalisation</span>
+        <div class="sol-title" data-t="sol.06-title">Intégration avec vos systèmes existants</div>
+        <div class="sol-desc" data-t="sol.06-desc">Origin s'intègre via API avec votre système fiscal, votre ERP ou vos outils métier actuels. Il enrichit et complète l'existant, sans le remplacer.</div>
+        <span class="sol-tag" data-t="sol.06-tag">API REST · Interopérabilité · Personnalisation</span>
       </div>
     </div>
 
@@ -673,28 +691,28 @@
         <div class="dp-dot" style="background:#fca5a5;"></div>
         <div class="dp-dot" style="background:#fcd34d;"></div>
         <div class="dp-dot" style="background:#6ee7b7;"></div>
-        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Intelligence territoriale · Vue d'ensemble</span>
+        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;" data-t="dp.topbar">Origin · Intelligence territoriale · Vue d'ensemble</span>
       </div>
       <div class="dp-inner">
         <div class="kpi-card">
-          <div class="kpi-label">Établissements cartographiés</div>
+          <div class="kpi-label" data-t="kpi.1-label">Établissements cartographiés</div>
           <div class="kpi-val kpi-blue">12 438</div>
-          <div class="kpi-sub">↑ +847 ce trimestre</div>
+          <div class="kpi-sub" data-t="kpi.1-sub">↑ +847 ce trimestre</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Taux de couverture du territoire</div>
+          <div class="kpi-label" data-t="kpi.2-label">Taux de couverture du territoire</div>
           <div class="kpi-val kpi-green">74%</div>
-          <div class="kpi-sub">↑ +18 pts vs. an dernier</div>
+          <div class="kpi-sub" data-t="kpi.2-sub">↑ +18 pts vs. an dernier</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Secteurs d'activité identifiés</div>
+          <div class="kpi-label" data-t="kpi.3-label">Secteurs d'activité identifiés</div>
           <div class="kpi-val kpi-blue">34</div>
-          <div class="kpi-sub">Classification automatique NAF</div>
+          <div class="kpi-sub" data-t="kpi.3-sub">Classification automatique NAF</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Nouveaux acteurs non enregistrés</div>
+          <div class="kpi-label" data-t="kpi.4-label">Nouveaux acteurs non enregistrés</div>
           <div class="kpi-val kpi-amber">3 201</div>
-          <div class="kpi-sub">Détectés, en attente de traitement</div>
+          <div class="kpi-sub" data-t="kpi.4-sub">Détectés, en attente de traitement</div>
         </div>
       </div>
     </div>
@@ -705,41 +723,40 @@
 <section id="how">
   <div class="container">
     <div class="section-header">
-      <span class="badge">Comment ça marche</span>
-      <h2>De la collecte terrain à la décision publique</h2>
-      <p class="section-sub">Un processus continu, automatisé et non-invasif. Votre administration reste en contrôle à chaque étape.</p>
+      <span class="badge" data-t="how.badge">Comment ça marche</span>
+      <h2 data-t="how.h2">De la collecte terrain à la décision publique</h2>
+      <p class="section-sub" data-t="how.sub">Un processus continu, automatisé et non-invasif. Votre administration reste en contrôle à chaque étape.</p>
     </div>
     <div class="steps">
       <div class="step">
         <div class="step-dot">📷</div>
-        <div class="step-title">1. Collecte terrain</div>
-        <div class="step-desc">Un véhicule caméra parcourt le territoire. L'IA analyse les images en temps réel et détecte chaque point d'activité économique : boutiques, ateliers, prestataires, marchés.</div>
+        <div class="step-title" data-t="step1.title">1. Collecte terrain</div>
+        <div class="step-desc" data-t="step1.desc">Un véhicule caméra parcourt le territoire. L'IA analyse les images en temps réel et détecte chaque point d'activité économique : boutiques, ateliers, prestataires, marchés.</div>
       </div>
       <div class="step">
         <div class="step-dot">⚙️</div>
-        <div class="step-title">2. Traitement & structuration</div>
-        <div class="step-desc">Les données sont automatiquement géocodées, classées par secteur et croisées avec vos registres existants pour identifier ce qui est connu, ce qui est nouveau, ce qui a changé.</div>
+        <div class="step-title" data-t="step2.title">2. Traitement & structuration</div>
+        <div class="step-desc" data-t="step2.desc">Les données sont automatiquement géocodées, classées par secteur et croisées avec vos registres existants pour identifier ce qui est connu, ce qui est nouveau, ce qui a changé.</div>
       </div>
       <div class="step">
         <div class="step-dot">🗺️</div>
-        <div class="step-title">3. Mise à jour du registre</div>
-        <div class="step-desc">Votre registre territorial est enrichi en continu. Vos équipes valident, complètent et prennent des décisions à partir d'une base de données toujours à jour.</div>
+        <div class="step-title" data-t="step3.title">3. Mise à jour du registre</div>
+        <div class="step-desc" data-t="step3.desc">Votre registre territorial est enrichi en continu. Vos équipes valident, complètent et prennent des décisions à partir d'une base de données toujours à jour.</div>
       </div>
       <div class="step">
         <div class="step-dot">🏛️</div>
-        <div class="step-title">4. Action & gouvernance</div>
-        <div class="step-desc">Politique fiscale, urbanisme, services publics, planification économique : chaque décision s'appuie sur une image fidèle du territoire. Les résultats sont mesurés en temps réel.</div>
+        <div class="step-title" data-t="step4.title">4. Action & gouvernance</div>
+        <div class="step-desc" data-t="step4.desc">Politique fiscale, urbanisme, services publics, planification économique : chaque décision s'appuie sur une image fidèle du territoire. Les résultats sont mesurés en temps réel.</div>
       </div>
     </div>
-    <!-- Vidéo détection computer vision -->
     <div class="how-video">
-      <div class="how-video-label">Détection en temps réel par vision par ordinateur</div>
+      <div class="how-video-label" data-t="how.video-label">Détection en temps réel par vision par ordinateur</div>
       <div class="how-video-frame">
         <div class="how-video-topbar">
           <div class="dp-dot" style="background:#fca5a5;"></div>
           <div class="dp-dot" style="background:#fcd34d;"></div>
           <div class="dp-dot" style="background:#6ee7b7;"></div>
-          <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Détection terrain · Vision par ordinateur</span>
+          <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;" data-t="how.video-topbar">Origin · Détection terrain · Vision par ordinateur</span>
         </div>
         <video autoplay muted loop playsinline controls preload="auto"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -748,7 +765,7 @@
         </video>
         <div class="how-video-placeholder" style="display:none;">
           <div class="play-icon">▶</div>
-          <span>Déposer <code style="color:rgba(255,255,255,.5)">detection-video.mp4</code> dans <code style="color:rgba(255,255,255,.5)">/public/</code></span>
+          <span data-th="how.video-placeholder">Déposer <code style="color:rgba(255,255,255,.5)">detection-video.mp4</code> dans <code style="color:rgba(255,255,255,.5)">/public/</code></span>
         </div>
       </div>
     </div>
@@ -759,45 +776,45 @@
 <section id="profiles">
   <div class="container">
     <div class="section-header">
-      <span class="badge">Votre situation</span>
-      <h2>Origin s'adapte à votre point de départ</h2>
-      <p class="section-sub">Chaque pays a son propre niveau de maturité institutionnelle. Origin fonctionne dans tous les cas, en apportant exactement ce qui manque.</p>
+      <span class="badge" data-t="profiles.badge">Votre situation</span>
+      <h2 data-t="profiles.h2">Origin s'adapte à votre point de départ</h2>
+      <p class="section-sub" data-t="profiles.sub">Chaque pays a son propre niveau de maturité institutionnelle. Origin fonctionne dans tous les cas, en apportant exactement ce qui manque.</p>
     </div>
     <div class="forwho-grid">
       <div class="forwho-card">
         <span class="fw-emoji">🌱</span>
-        <div class="fw-title">Vous n'avez ni détection, ni registre structuré</div>
-        <div class="fw-desc">Votre territoire dispose de peu de données économiques formalisées. Origin vous permet de partir de zéro et de construire une base solide pour toute politique publique.</div>
+        <div class="fw-title" data-t="fw1.title">Vous n'avez ni détection, ni registre structuré</div>
+        <div class="fw-desc" data-t="fw1.desc">Votre territoire dispose de peu de données économiques formalisées. Origin vous permet de partir de zéro et de construire une base solide pour toute politique publique.</div>
         <ul class="fw-list">
-          <li>Cartographie initiale complète du territoire</li>
-          <li>Constitution d'un registre économique de référence</li>
-          <li>Identification des acteurs économiques clés</li>
-          <li>Tableau de bord pour les décideurs</li>
-          <li>Module fiscal activable selon vos priorités</li>
+          <li data-t="fw1.li1">Cartographie initiale complète du territoire</li>
+          <li data-t="fw1.li2">Constitution d'un registre économique de référence</li>
+          <li data-t="fw1.li3">Identification des acteurs économiques clés</li>
+          <li data-t="fw1.li4">Tableau de bord pour les décideurs</li>
+          <li data-t="fw1.li5">Module fiscal activable selon vos priorités</li>
         </ul>
       </div>
       <div class="forwho-card">
         <span class="fw-emoji">🔧</span>
-        <div class="fw-title">Vous avez un système fiscal, mais pas de détection terrain</div>
-        <div class="fw-desc">Vos outils de gestion fiscale existent, mais vos registres sont incomplets. Des acteurs économiques opèrent en dehors de votre radar, et vous le savez. Origin comble ce manque.</div>
+        <div class="fw-title" data-t="fw2.title">Vous avez un système fiscal, mais pas de détection terrain</div>
+        <div class="fw-desc" data-t="fw2.desc">Vos outils de gestion fiscale existent, mais vos registres sont incomplets. Des acteurs économiques opèrent en dehors de votre radar, et vous le savez. Origin comble ce manque.</div>
         <ul class="fw-list">
-          <li>Détection des acteurs absents de votre registre</li>
-          <li>Enrichissement et mise à jour de vos données existantes</li>
-          <li>Intégration via API avec vos systèmes actuels</li>
-          <li>Aucune remise en cause de votre infrastructure</li>
-          <li>Conformité et compliance simplifiées</li>
+          <li data-t="fw2.li1">Détection des acteurs absents de votre registre</li>
+          <li data-t="fw2.li2">Enrichissement et mise à jour de vos données existantes</li>
+          <li data-t="fw2.li3">Intégration via API avec vos systèmes actuels</li>
+          <li data-t="fw2.li4">Aucune remise en cause de votre infrastructure</li>
+          <li data-t="fw2.li5">Conformité et compliance simplifiées</li>
         </ul>
       </div>
       <div class="forwho-card">
         <span class="fw-emoji">🌐</span>
-        <div class="fw-title">Vous pilotez à l'échelle nationale ou régionale</div>
-        <div class="fw-desc">Ministères, directions fiscales, bailleurs de fonds, organisations internationales : vous avez besoin d'une vision consolidée, comparative et fiable de l'activité économique à grande échelle.</div>
+        <div class="fw-title" data-t="fw3.title">Vous pilotez à l'échelle nationale ou régionale</div>
+        <div class="fw-desc" data-t="fw3.desc">Ministères, directions fiscales, bailleurs de fonds, organisations internationales : vous avez besoin d'une vision consolidée, comparative et fiable de l'activité économique à grande échelle.</div>
         <ul class="fw-list">
-          <li>Tableau de bord agrégé multi-territoires</li>
-          <li>Indicateurs comparatifs entre régions ou communes</li>
-          <li>Données structurées pour la réforme fiscale</li>
-          <li>Reporting pour les partenaires institutionnels</li>
-          <li>Suivi des programmes de formalisation</li>
+          <li data-t="fw3.li1">Tableau de bord agrégé multi-territoires</li>
+          <li data-t="fw3.li2">Indicateurs comparatifs entre régions ou communes</li>
+          <li data-t="fw3.li3">Données structurées pour la réforme fiscale</li>
+          <li data-t="fw3.li4">Reporting pour les partenaires institutionnels</li>
+          <li data-t="fw3.li5">Suivi des programmes de formalisation</li>
         </ul>
       </div>
     </div>
@@ -808,50 +825,50 @@
 <section id="features">
   <div class="container">
     <div class="section-header">
-      <span class="badge">Fonctionnalités clés</span>
-      <h2>Tout ce dont votre administration a besoin</h2>
+      <span class="badge" data-t="features.badge">Fonctionnalités clés</span>
+      <h2 data-t="features.h2">Tout ce dont votre administration a besoin</h2>
     </div>
     <div class="features-grid">
       <div class="feat-card">
         <div class="feat-icon">🛰️</div>
         <div>
-          <div class="feat-title">Cartographie interactive du territoire</div>
-          <div class="feat-desc">Visualisez l'intégralité des établissements économiques sur une carte dynamique. Filtrez par secteur, statut, zone géographique ou niveau d'activité. Identifiez les concentrations et les angles morts.</div>
+          <div class="feat-title" data-t="feat1.title">Cartographie interactive du territoire</div>
+          <div class="feat-desc" data-t="feat1.desc">Visualisez l'intégralité des établissements économiques sur une carte dynamique. Filtrez par secteur, statut, zone géographique ou niveau d'activité. Identifiez les concentrations et les angles morts.</div>
         </div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🔎</div>
         <div>
-          <div class="feat-title">Détection IA à haute précision</div>
-          <div class="feat-desc">Notre modèle de vision par ordinateur atteint 82–97% de précision sur la détection de commerces et établissements. Il lit les enseignes, identifie les secteurs et géolocalise automatiquement chaque point d'activité.</div>
+          <div class="feat-title" data-t="feat2.title">Détection IA à haute précision</div>
+          <div class="feat-desc" data-t="feat2.desc">Notre modèle de vision par ordinateur atteint 82–97% de précision sur la détection de commerces et établissements. Il lit les enseignes, identifie les secteurs et géolocalise automatiquement chaque point d'activité.</div>
         </div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">📈</div>
         <div>
-          <div class="feat-title">Évolution dans le temps</div>
-          <div class="feat-desc">Comparez l'état de votre territoire d'un trimestre à l'autre. Mesurez l'impact de vos politiques, suivez l'évolution de la formalisation et identifiez les tendances sectorielles émergentes.</div>
+          <div class="feat-title" data-t="feat3.title">Évolution dans le temps</div>
+          <div class="feat-desc" data-t="feat3.desc">Comparez l'état de votre territoire d'un trimestre à l'autre. Mesurez l'impact de vos politiques, suivez l'évolution de la formalisation et identifiez les tendances sectorielles émergentes.</div>
         </div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🏢</div>
         <div>
-          <div class="feat-title">Vue consolidée par opérateur économique</div>
-          <div class="feat-desc">Agrégez les établissements par responsable ou entité. Comprenez qui sont les acteurs multi-sites, leur poids économique et leur situation vis-à-vis de l'administration.</div>
+          <div class="feat-title" data-t="feat4.title">Vue consolidée par opérateur économique</div>
+          <div class="feat-desc" data-t="feat4.desc">Agrégez les établissements par responsable ou entité. Comprenez qui sont les acteurs multi-sites, leur poids économique et leur situation vis-à-vis de l'administration.</div>
         </div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">⚠️</div>
         <div>
-          <div class="feat-title">Alertes et priorités de traitement</div>
-          <div class="feat-desc">Identifiez automatiquement les nouvelles détections, les incohérences avec vos registres existants ou les situations nécessitant une action de vos équipes. Priorisez sans effort.</div>
+          <div class="feat-title" data-t="feat5.title">Alertes et priorités de traitement</div>
+          <div class="feat-desc" data-t="feat5.desc">Identifiez automatiquement les nouvelles détections, les incohérences avec vos registres existants ou les situations nécessitant une action de vos équipes. Priorisez sans effort.</div>
         </div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">📥</div>
         <div>
-          <div class="feat-title">Export, API & rapports institutionnels</div>
-          <div class="feat-desc">Exportez vos données vers Excel, PDF ou via API vers vos systèmes existants. Générez des rapports structurés pour vos instances de gouvernance, tutelles ou partenaires internationaux.</div>
+          <div class="feat-title" data-t="feat6.title">Export, API & rapports institutionnels</div>
+          <div class="feat-desc" data-t="feat6.desc">Exportez vos données vers Excel, PDF ou via API vers vos systèmes existants. Générez des rapports structurés pour vos instances de gouvernance, tutelles ou partenaires internationaux.</div>
         </div>
       </div>
     </div>
@@ -862,55 +879,55 @@
 <section id="impact">
   <div class="container">
     <div class="section-header">
-      <span class="badge">Impact mesurable</span>
-      <h2>Des résultats concrets, dès la première année</h2>
-      <p class="section-sub">Qu'il s'agisse de mieux connaître votre territoire, d'optimiser votre collecte fiscale ou d'éclairer vos politiques publiques, Origin produit des effets mesurables rapidement.</p>
+      <span class="badge" data-t="impact.badge">Impact mesurable</span>
+      <h2 data-t="impact.h2">Des résultats concrets, dès la première année</h2>
+      <p class="section-sub" data-t="impact.sub">Qu'il s'agisse de mieux connaître votre territoire, d'optimiser votre collecte fiscale ou d'éclairer vos politiques publiques, Origin produit des effets mesurables rapidement.</p>
     </div>
     <div class="impact-grid">
       <div class="impact-cards">
         <div class="impact-card highlight">
-          <div class="impact-num">×3 à ×5</div>
+          <div class="impact-num" data-t="ic1.num">×3 à ×5</div>
           <div class="impact-label">
-            <strong>Couverture du registre économique</strong>
-            Nombre d'établissements connus de l'administration après déploiement d'Origin, par rapport à l'état initial
+            <strong data-t="ic1.title">Couverture du registre économique</strong>
+            <span data-t="ic1.desc">Nombre d'établissements connus de l'administration après déploiement d'Origin, par rapport à l'état initial</span>
           </div>
         </div>
         <div class="impact-card">
-          <div class="impact-num">×4,5</div>
+          <div class="impact-num" data-t="ic2.num">×4,5</div>
           <div class="impact-label">
-            <strong>Vitesse de recensement</strong>
-            La détection IA couvre en une journée ce qu'une équipe terrain accomplit en une semaine, pour un coût divisé par 3
+            <strong data-t="ic2.title">Vitesse de recensement</strong>
+            <span data-t="ic2.desc">La détection IA couvre en une journée ce qu'une équipe terrain accomplit en une semaine, pour un coût divisé par 3</span>
           </div>
         </div>
         <div class="impact-card">
           <div class="impact-num">+40%</div>
           <div class="impact-label">
-            <strong>Recettes fiscales locales</strong>
-            Augmentation moyenne observée dès la première année dans les territoires activant le module fiscal d'Origin
+            <strong data-t="ic3.title">Recettes fiscales locales</strong>
+            <span data-t="ic3.desc">Augmentation moyenne observée dès la première année dans les territoires activant le module fiscal d'Origin</span>
           </div>
         </div>
         <div class="impact-card">
-          <div class="impact-num">&lt;8 sem.</div>
+          <div class="impact-num" data-t="ic4.num">&lt;8 sem.</div>
           <div class="impact-label">
-            <strong>Délai de déploiement</strong>
-            De la signature du contrat aux premières données exploitables sur votre territoire
+            <strong data-t="ic4.title">Délai de déploiement</strong>
+            <span data-t="ic4.desc">De la signature du contrat aux premières données exploitables sur votre territoire</span>
           </div>
         </div>
       </div>
       <div class="impact-quote">
-        <blockquote>
+        <blockquote data-t="quote.text">
           "L'activité économique réelle de nos communes existe largement en dehors de tout registre. Ce n'est pas un problème de fraude, c'est un problème de visibilité. Origin nous permet enfin de voir ce qui se passe sur notre territoire, et d'y répondre de manière structurée et documentée."
         </blockquote>
         <cite>
-          <span class="cite-name">Responsable des Finances locales</span>
-          <span class="cite-role">Administration territoriale</span>
+          <span class="cite-name" data-t="cite.name">Responsable des Finances locales</span>
+          <span class="cite-role" data-t="cite.role">Administration territoriale</span>
         </cite>
         <div class="quote-context">
-          <span class="ctx-chip">Mairies & communes</span>
-          <span class="ctx-chip">Régions & agglomérations</span>
-          <span class="ctx-chip">Ministères des Finances</span>
-          <span class="ctx-chip">Directions fiscales</span>
-          <span class="ctx-chip">Bailleurs de fonds</span>
+          <span class="ctx-chip" data-t="ctx.chip1">Mairies & communes</span>
+          <span class="ctx-chip" data-t="ctx.chip2">Régions & agglomérations</span>
+          <span class="ctx-chip" data-t="ctx.chip3">Ministères des Finances</span>
+          <span class="ctx-chip" data-t="ctx.chip4">Directions fiscales</span>
+          <span class="ctx-chip" data-t="ctx.chip5">Bailleurs de fonds</span>
         </div>
       </div>
     </div>
@@ -921,9 +938,9 @@
 <section id="cta">
   <div class="container">
     <div class="cta-box">
-      <span class="badge" style="margin-bottom:24px;">Premiers contacts</span>
-      <h2>Quel que soit votre point de départ,<br/>commençons par votre territoire</h2>
-      <p>En 45 minutes, nous vous montrons concrètement ce que Origin peut cartographier sur votre territoire, et comment la plateforme s'adapte à votre situation institutionnelle actuelle.</p>
+      <span class="badge" style="margin-bottom:24px;" data-t="cta.badge">Premiers contacts</span>
+      <h2 data-th="cta.h2">Quel que soit votre point de départ,<br/>commençons par votre territoire</h2>
+      <p data-t="cta.p">En 45 minutes, nous vous montrons concrètement ce que Origin peut cartographier sur votre territoire, et comment la plateforme s'adapte à votre situation institutionnelle actuelle.</p>
       <div style="margin: 32px auto 0; max-width: 700px;">
         <!-- meetergo widget start -->
         <div style="min-width:330px" class="meetergo-iframe" link="https://cal.meetergo.com/tmethesovcie/30-min-meeting-with-tristan"></div>
@@ -931,10 +948,10 @@
         <!-- meetergo widget end -->
       </div>
       <div class="cta-detail">
-        <span>Démonstration personnalisée</span>
-        <span>Analyse de votre situation incluse</span>
-        <span>Déployable en moins de 8 semaines</span>
-        <span>Support multilingue</span>
+        <span data-t="cta.d1">Démonstration personnalisée</span>
+        <span data-t="cta.d2">Analyse de votre situation incluse</span>
+        <span data-t="cta.d3">Déployable en moins de 8 semaines</span>
+        <span data-t="cta.d4">Support multilingue</span>
       </div>
     </div>
   </div>
@@ -943,12 +960,356 @@
 <!-- ─── FOOTER ─────────────────────────────────────── -->
 <footer>
   <div class="container footer-inner">
-    <span>© 2026 Origin · The Sov Cie. Tous droits réservés.</span>
+    <span data-t="footer.copy">© 2026 Origin · The Sov Cie. Tous droits réservés.</span>
     <span style="display:flex; gap:20px;">
       <a href="mailto:contact@originsov.com">contact@originsov.com</a>
     </span>
   </div>
 </footer>
+
+<script>
+const T = {
+  fr: {
+    'meta.title': 'Origin · Intelligence territoriale en temps réel',
+    'meta.description': "Origin cartographie l'intégralité de l'activité économique d'un territoire par IA. Voyez, comprenez et gouvernez votre économie, pour toute administration qui décide sur son territoire.",
+    'nav.challenge': 'Le défi',
+    'nav.platform': 'La plateforme',
+    'nav.profiles': 'Votre situation',
+    'nav.impact': 'Impact',
+    'nav.contact': 'Contact',
+    'nav.cta': 'Demander une démo',
+    'nav.cta-mobile': 'Démo',
+    'hero.badge': 'Intelligence territoriale',
+    'hero.h1': 'Voyez, comprenez et gouvernez<br/><em>votre économie en temps réel</em>',
+    'hero.sub': "Origin cartographie l'intégralité de l'activité économique d'un territoire par IA. Une donnée de terrain fiable, continue et exploitable, pour toute administration qui décide sur son économie.",
+    'hero.btn-primary': 'Demander une démonstration',
+    'hero.btn-ghost': 'Découvrir la plateforme →',
+    'hero.stat1-label': "de l'activité économique réelle absente des registres officiels dans la plupart des pays",
+    'hero.stat2-num': '×4,5',
+    'hero.stat2-label': 'plus rapide que le recensement manuel, à une fraction du coût',
+    'hero.stat3-label': 'de précision de détection et géolocalisation des établissements par IA',
+    'screenshot.label': 'Le tableau de bord Origin',
+    'screenshot.topbar': 'Origin · Intelligence territoriale',
+    'screenshot.alt': 'Tableau de bord Origin',
+    'screenshot.placeholder': 'Déposer <code>dashboard-screenshot.png</code> dans <code>/public/</code>',
+    'problem.badge': 'Le défi universel',
+    'problem.h2': "On ne gouverne pas ce qu'on ne voit pas",
+    'problem.sub': "Quel que soit le niveau de maturité de votre administration, la question de fond est identique : disposez-vous d'une image fidèle et à jour de l'activité économique sur votre territoire ?",
+    'problem.visual-title': "Part de l'activité économique visible par les administrations (estimations)",
+    'problem.bar1': 'Commerce',
+    'problem.bar2': 'Restauration',
+    'problem.bar3': 'Artisanat',
+    'problem.bar4': 'Transport',
+    'problem.bar5': 'Services',
+    'problem.callout': "⚠ En moyenne, moins d'un établissement sur trois est connu de l'administration dans les pays à économie mixte ou en développement.",
+    'problem.pp1-title': 'Une activité économique largement invisible',
+    'problem.pp1-desc': "Des milliers d'établissements (boutiques, ateliers, prestataires de services) opèrent sans avoir jamais été recensés. Ils n'existent dans aucune base de données publique.",
+    'problem.pp2-title': 'Des registres figés dans le temps',
+    'problem.pp2-desc': "Les recensements manuels sont ponctuels, coûteux et rapidement obsolètes. L'image que votre administration a de son territoire peut avoir plusieurs années de retard.",
+    'problem.pp3-title': 'Des décisions sans données fiables',
+    'problem.pp3-desc': "Politique économique, fiscalité, urbanisme, planification des services publics : chaque décision prise sans cartographie précise repose sur des hypothèses, pas sur des faits.",
+    'solution.badge': 'La plateforme',
+    'solution.h2': 'De la rue à la décision : un cycle continu',
+    'solution.sub': "Origin transforme les données de terrain en intelligence territoriale exploitable. La fiscalité est l'une des applications possibles ; la visibilité économique est le fondement.",
+    'sol.01-title': "Détection terrain par IA embarquée",
+    'sol.01-desc': "Un véhicule équipé d'une caméra parcourt le territoire. Notre modèle de vision identifie et géolocalise automatiquement chaque établissement (enseignes, secteur, type d'activité) à 90% de précision.",
+    'sol.01-tag': 'Vision par ordinateur · OCR · Géocodage',
+    'sol.02-title': 'Registre territorial en temps réel',
+    'sol.02-desc': "Chaque établissement détecté est versé dans un registre structuré avec ses coordonnées GPS, son secteur d'activité, son statut et son historique. Une base de données vivante, mise à jour en continu.",
+    'sol.02-tag': 'Base de données · Cartographie · Enrichissement',
+    'sol.03-title': 'Identification des opérateurs économiques',
+    'sol.03-desc': "Associez chaque établissement à son responsable. Consolidez les profils multi-sites. Constituez un annuaire des acteurs économiques de votre territoire, utilisable pour n'importe quelle politique publique.",
+    'sol.03-tag': 'KYC · Consolidation · Suivi des acteurs',
+    'sol.04-title': 'Tableau de bord décisionnel',
+    'sol.04-desc': "Une vue synthétique et géographique de l'activité économique de votre territoire : densité sectorielle, évolution dans le temps, zones d'activité, indicateurs personnalisables selon vos priorités.",
+    'sol.04-tag': 'Analytics · Cartographie · Reporting',
+    'sol.05-title': 'Module de gestion fiscale (optionnel)',
+    'sol.05-desc': "Pour les administrations qui souhaitent aller jusqu'à la collecte : affectation d'obligations, pilotage des agents terrain, suivi des paiements et des retards, recouvrement structuré.",
+    'sol.05-tag': 'Collecte · Agents · Recouvrement',
+    'sol.06-title': 'Intégration avec vos systèmes existants',
+    'sol.06-desc': "Origin s'intègre via API avec votre système fiscal, votre ERP ou vos outils métier actuels. Il enrichit et complète l'existant, sans le remplacer.",
+    'sol.06-tag': 'API REST · Interopérabilité · Personnalisation',
+    'dp.topbar': 'Origin · Intelligence territoriale · Vue d\'ensemble',
+    'kpi.1-label': 'Établissements cartographiés',
+    'kpi.1-sub': '↑ +847 ce trimestre',
+    'kpi.2-label': 'Taux de couverture du territoire',
+    'kpi.2-sub': '↑ +18 pts vs. an dernier',
+    'kpi.3-label': "Secteurs d'activité identifiés",
+    'kpi.3-sub': 'Classification automatique NAF',
+    'kpi.4-label': 'Nouveaux acteurs non enregistrés',
+    'kpi.4-sub': 'Détectés, en attente de traitement',
+    'how.badge': 'Comment ça marche',
+    'how.h2': 'De la collecte terrain à la décision publique',
+    'how.sub': "Un processus continu, automatisé et non-invasif. Votre administration reste en contrôle à chaque étape.",
+    'how.video-label': 'Détection en temps réel par vision par ordinateur',
+    'how.video-topbar': 'Origin · Détection terrain · Vision par ordinateur',
+    'how.video-placeholder': 'Déposer <code style="color:rgba(255,255,255,.5)">detection-video.mp4</code> dans <code style="color:rgba(255,255,255,.5)">/public/</code>',
+    'step1.title': '1. Collecte terrain',
+    'step1.desc': "Un véhicule caméra parcourt le territoire. L'IA analyse les images en temps réel et détecte chaque point d'activité économique : boutiques, ateliers, prestataires, marchés.",
+    'step2.title': '2. Traitement & structuration',
+    'step2.desc': "Les données sont automatiquement géocodées, classées par secteur et croisées avec vos registres existants pour identifier ce qui est connu, ce qui est nouveau, ce qui a changé.",
+    'step3.title': '3. Mise à jour du registre',
+    'step3.desc': "Votre registre territorial est enrichi en continu. Vos équipes valident, complètent et prennent des décisions à partir d'une base de données toujours à jour.",
+    'step4.title': '4. Action & gouvernance',
+    'step4.desc': "Politique fiscale, urbanisme, services publics, planification économique : chaque décision s'appuie sur une image fidèle du territoire. Les résultats sont mesurés en temps réel.",
+    'profiles.badge': 'Votre situation',
+    'profiles.h2': 'Origin s\'adapte à votre point de départ',
+    'profiles.sub': "Chaque pays a son propre niveau de maturité institutionnelle. Origin fonctionne dans tous les cas, en apportant exactement ce qui manque.",
+    'fw1.title': "Vous n'avez ni détection, ni registre structuré",
+    'fw1.desc': "Votre territoire dispose de peu de données économiques formalisées. Origin vous permet de partir de zéro et de construire une base solide pour toute politique publique.",
+    'fw1.li1': 'Cartographie initiale complète du territoire',
+    'fw1.li2': "Constitution d'un registre économique de référence",
+    'fw1.li3': 'Identification des acteurs économiques clés',
+    'fw1.li4': 'Tableau de bord pour les décideurs',
+    'fw1.li5': 'Module fiscal activable selon vos priorités',
+    'fw2.title': "Vous avez un système fiscal, mais pas de détection terrain",
+    'fw2.desc': "Vos outils de gestion fiscale existent, mais vos registres sont incomplets. Des acteurs économiques opèrent en dehors de votre radar, et vous le savez. Origin comble ce manque.",
+    'fw2.li1': 'Détection des acteurs absents de votre registre',
+    'fw2.li2': 'Enrichissement et mise à jour de vos données existantes',
+    'fw2.li3': 'Intégration via API avec vos systèmes actuels',
+    'fw2.li4': 'Aucune remise en cause de votre infrastructure',
+    'fw2.li5': 'Conformité et compliance simplifiées',
+    'fw3.title': 'Vous pilotez à l\'échelle nationale ou régionale',
+    'fw3.desc': "Ministères, directions fiscales, bailleurs de fonds, organisations internationales : vous avez besoin d'une vision consolidée, comparative et fiable de l'activité économique à grande échelle.",
+    'fw3.li1': 'Tableau de bord agrégé multi-territoires',
+    'fw3.li2': 'Indicateurs comparatifs entre régions ou communes',
+    'fw3.li3': 'Données structurées pour la réforme fiscale',
+    'fw3.li4': 'Reporting pour les partenaires institutionnels',
+    'fw3.li5': 'Suivi des programmes de formalisation',
+    'features.badge': 'Fonctionnalités clés',
+    'features.h2': 'Tout ce dont votre administration a besoin',
+    'feat1.title': 'Cartographie interactive du territoire',
+    'feat1.desc': "Visualisez l'intégralité des établissements économiques sur une carte dynamique. Filtrez par secteur, statut, zone géographique ou niveau d'activité. Identifiez les concentrations et les angles morts.",
+    'feat2.title': 'Détection IA à haute précision',
+    'feat2.desc': "Notre modèle de vision par ordinateur atteint 82–97% de précision sur la détection de commerces et établissements. Il lit les enseignes, identifie les secteurs et géolocalise automatiquement chaque point d'activité.",
+    'feat3.title': 'Évolution dans le temps',
+    'feat3.desc': "Comparez l'état de votre territoire d'un trimestre à l'autre. Mesurez l'impact de vos politiques, suivez l'évolution de la formalisation et identifiez les tendances sectorielles émergentes.",
+    'feat4.title': 'Vue consolidée par opérateur économique',
+    'feat4.desc': "Agrégez les établissements par responsable ou entité. Comprenez qui sont les acteurs multi-sites, leur poids économique et leur situation vis-à-vis de l'administration.",
+    'feat5.title': 'Alertes et priorités de traitement',
+    'feat5.desc': "Identifiez automatiquement les nouvelles détections, les incohérences avec vos registres existants ou les situations nécessitant une action de vos équipes. Priorisez sans effort.",
+    'feat6.title': 'Export, API & rapports institutionnels',
+    'feat6.desc': "Exportez vos données vers Excel, PDF ou via API vers vos systèmes existants. Générez des rapports structurés pour vos instances de gouvernance, tutelles ou partenaires internationaux.",
+    'impact.badge': 'Impact mesurable',
+    'impact.h2': 'Des résultats concrets, dès la première année',
+    'impact.sub': "Qu'il s'agisse de mieux connaître votre territoire, d'optimiser votre collecte fiscale ou d'éclairer vos politiques publiques, Origin produit des effets mesurables rapidement.",
+    'ic1.num': '×3 à ×5',
+    'ic1.title': 'Couverture du registre économique',
+    'ic1.desc': "Nombre d'établissements connus de l'administration après déploiement d'Origin, par rapport à l'état initial",
+    'ic2.num': '×4,5',
+    'ic2.title': 'Vitesse de recensement',
+    'ic2.desc': "La détection IA couvre en une journée ce qu'une équipe terrain accomplit en une semaine, pour un coût divisé par 3",
+    'ic3.title': 'Recettes fiscales locales',
+    'ic3.desc': "Augmentation moyenne observée dès la première année dans les territoires activant le module fiscal d'Origin",
+    'ic4.num': '<8 sem.',
+    'ic4.title': 'Délai de déploiement',
+    'ic4.desc': 'De la signature du contrat aux premières données exploitables sur votre territoire',
+    'quote.text': "\"L'activité économique réelle de nos communes existe largement en dehors de tout registre. Ce n'est pas un problème de fraude, c'est un problème de visibilité. Origin nous permet enfin de voir ce qui se passe sur notre territoire, et d'y répondre de manière structurée et documentée.\"",
+    'cite.name': 'Responsable des Finances locales',
+    'cite.role': 'Administration territoriale',
+    'ctx.chip1': 'Mairies & communes',
+    'ctx.chip2': 'Régions & agglomérations',
+    'ctx.chip3': 'Ministères des Finances',
+    'ctx.chip4': 'Directions fiscales',
+    'ctx.chip5': 'Bailleurs de fonds',
+    'cta.badge': 'Premiers contacts',
+    'cta.h2': 'Quel que soit votre point de départ,<br/>commençons par votre territoire',
+    'cta.p': "En 45 minutes, nous vous montrons concrètement ce que Origin peut cartographier sur votre territoire, et comment la plateforme s'adapte à votre situation institutionnelle actuelle.",
+    'cta.d1': 'Démonstration personnalisée',
+    'cta.d2': 'Analyse de votre situation incluse',
+    'cta.d3': 'Déployable en moins de 8 semaines',
+    'cta.d4': 'Support multilingue',
+    'footer.copy': '© 2026 Origin · The Sov Cie. Tous droits réservés.',
+  },
+  en: {
+    'meta.title': 'Origin · Real-Time Territorial Intelligence',
+    'meta.description': "Origin maps the entirety of a territory's economic activity using AI. See, understand and govern your economy — for any administration making decisions about their territory.",
+    'nav.challenge': 'The Challenge',
+    'nav.platform': 'The Platform',
+    'nav.profiles': 'Your Situation',
+    'nav.impact': 'Impact',
+    'nav.contact': 'Contact',
+    'nav.cta': 'Request a Demo',
+    'nav.cta-mobile': 'Demo',
+    'hero.badge': 'Territorial Intelligence',
+    'hero.h1': 'See, understand and govern<br/><em>your economy in real time</em>',
+    'hero.sub': "Origin maps the entirety of a territory's economic activity using AI. Reliable, continuous, and actionable field data for any administration making decisions about its economy.",
+    'hero.btn-primary': 'Request a Demo',
+    'hero.btn-ghost': 'Explore the Platform →',
+    'hero.stat1-label': 'of actual economic activity missing from official registries in most countries',
+    'hero.stat2-num': '×4.5',
+    'hero.stat2-label': 'faster than manual census, at a fraction of the cost',
+    'hero.stat3-label': 'AI detection and geolocation accuracy for business establishments',
+    'screenshot.label': 'The Origin Dashboard',
+    'screenshot.topbar': 'Origin · Territorial Intelligence',
+    'screenshot.alt': 'Origin Dashboard',
+    'screenshot.placeholder': 'Place <code>dashboard-screenshot.png</code> in <code>/public/</code>',
+    'problem.badge': 'The Universal Challenge',
+    'problem.h2': "You can't govern what you can't see",
+    'problem.sub': "Regardless of your administration's maturity level, the core question is the same: do you have an accurate, up-to-date picture of economic activity across your territory?",
+    'problem.visual-title': 'Share of economic activity visible to administrations (estimates)',
+    'problem.bar1': 'Retail',
+    'problem.bar2': 'Food & Beverage',
+    'problem.bar3': 'Crafts & Trades',
+    'problem.bar4': 'Transport',
+    'problem.bar5': 'Services',
+    'problem.callout': '⚠ On average, fewer than one in three businesses is known to authorities in mixed or developing economies.',
+    'problem.pp1-title': 'A largely invisible economic landscape',
+    'problem.pp1-desc': "Thousands of businesses — shops, workshops, service providers — operate without ever being recorded. They don't exist in any public database.",
+    'problem.pp2-title': 'Registries frozen in time',
+    'problem.pp2-desc': "Manual censuses are one-off, costly, and quickly outdated. Your administration's picture of its territory may be years behind reality.",
+    'problem.pp3-title': 'Decisions without reliable data',
+    'problem.pp3-desc': 'Economic policy, taxation, urban planning, public service delivery: every decision made without precise mapping is based on assumptions, not facts.',
+    'solution.badge': 'The Platform',
+    'solution.h2': 'From street to decision: a continuous cycle',
+    'solution.sub': 'Origin transforms field data into actionable territorial intelligence. Taxation is one possible application; economic visibility is the foundation.',
+    'sol.01-title': 'On-the-Ground AI Detection',
+    'sol.01-desc': 'A camera-equipped vehicle travels through the territory. Our vision model automatically identifies and geolocates each business (signage, sector, activity type) with 90% accuracy.',
+    'sol.01-tag': 'Computer Vision · OCR · Geocoding',
+    'sol.02-title': 'Real-Time Territorial Registry',
+    'sol.02-desc': 'Each detected business is added to a structured registry with GPS coordinates, business sector, status, and history. A living database, continuously updated.',
+    'sol.02-tag': 'Database · Mapping · Enrichment',
+    'sol.03-title': 'Identification of Economic Operators',
+    'sol.03-desc': "Link each establishment to its owner. Consolidate multi-site profiles. Build a directory of your territory's economic actors, usable for any public policy.",
+    'sol.03-tag': 'KYC · Consolidation · Operator Tracking',
+    'sol.04-title': 'Decision-Making Dashboard',
+    'sol.04-desc': 'A synthetic and geographic view of your territory\'s economic activity: sector density, trends over time, activity zones, customizable indicators based on your priorities.',
+    'sol.04-tag': 'Analytics · Mapping · Reporting',
+    'sol.05-title': 'Tax Management Module (optional)',
+    'sol.05-desc': 'For administrations that want to go all the way to collection: obligation assignment, field agent management, payment and arrears tracking, structured recovery.',
+    'sol.05-tag': 'Collection · Agents · Recovery',
+    'sol.06-title': 'Integration with Your Existing Systems',
+    'sol.06-desc': 'Origin integrates via API with your tax system, ERP, or current business tools. It enriches and complements what you already have, without replacing it.',
+    'sol.06-tag': 'REST API · Interoperability · Customization',
+    'dp.topbar': 'Origin · Territorial Intelligence · Overview',
+    'kpi.1-label': 'Mapped Establishments',
+    'kpi.1-sub': '↑ +847 this quarter',
+    'kpi.2-label': 'Territory Coverage Rate',
+    'kpi.2-sub': '↑ +18 pts vs. last year',
+    'kpi.3-label': 'Business Sectors Identified',
+    'kpi.3-sub': 'Automatic sector classification',
+    'kpi.4-label': 'Unregistered New Operators',
+    'kpi.4-sub': 'Detected, awaiting processing',
+    'how.badge': 'How It Works',
+    'how.h2': 'From field collection to public decision-making',
+    'how.sub': 'A continuous, automated, and non-invasive process. Your administration stays in control at every step.',
+    'how.video-label': 'Real-time detection by computer vision',
+    'how.video-topbar': 'Origin · Field Detection · Computer Vision',
+    'how.video-placeholder': 'Place <code style="color:rgba(255,255,255,.5)">detection-video.mp4</code> in <code style="color:rgba(255,255,255,.5)">/public/</code>',
+    'step1.title': '1. Field Collection',
+    'step1.desc': 'A camera vehicle travels through the territory. The AI analyzes images in real time and detects every point of economic activity: shops, workshops, service providers, markets.',
+    'step2.title': '2. Processing & Structuring',
+    'step2.desc': 'Data is automatically geocoded, classified by sector, and cross-referenced with your existing registries to identify what\'s known, what\'s new, and what has changed.',
+    'step3.title': '3. Registry Update',
+    'step3.desc': 'Your territorial registry is continuously enriched. Your teams validate, add details, and make decisions based on an always up-to-date database.',
+    'step4.title': '4. Action & Governance',
+    'step4.desc': 'Tax policy, urban planning, public services, economic planning: every decision is based on an accurate picture of the territory. Results are measured in real time.',
+    'profiles.badge': 'Your Situation',
+    'profiles.h2': 'Origin adapts to your starting point',
+    'profiles.sub': 'Every country has its own level of institutional maturity. Origin works in every case, bringing exactly what\'s missing.',
+    'fw1.title': 'You have no detection system or structured registry',
+    'fw1.desc': 'Your territory has little formalized economic data. Origin lets you start from scratch and build a solid foundation for any public policy.',
+    'fw1.li1': 'Full initial mapping of the territory',
+    'fw1.li2': 'Building a reference economic registry',
+    'fw1.li3': 'Identification of key economic actors',
+    'fw1.li4': 'Decision-maker dashboard',
+    'fw1.li5': 'Tax module activatable per your priorities',
+    'fw2.title': 'You have a tax system, but no field detection',
+    'fw2.desc': "Your tax management tools exist, but your registries are incomplete. Economic actors are operating off your radar — and you know it. Origin closes that gap.",
+    'fw2.li1': 'Detection of actors missing from your registry',
+    'fw2.li2': 'Enrichment and update of your existing data',
+    'fw2.li3': 'API integration with your current systems',
+    'fw2.li4': 'No disruption to your existing infrastructure',
+    'fw2.li5': 'Simplified compliance',
+    'fw3.title': 'You operate at national or regional scale',
+    'fw3.desc': 'Ministries, tax departments, development finance institutions, international organizations: you need a consolidated, comparative, and reliable view of economic activity at scale.',
+    'fw3.li1': 'Aggregated multi-territory dashboard',
+    'fw3.li2': 'Comparative indicators across regions or municipalities',
+    'fw3.li3': 'Structured data for tax reform',
+    'fw3.li4': 'Reporting for institutional partners',
+    'fw3.li5': 'Tracking of formalization programs',
+    'features.badge': 'Key Features',
+    'features.h2': 'Everything your administration needs',
+    'feat1.title': 'Interactive Territory Mapping',
+    'feat1.desc': 'Visualize all economic establishments on a dynamic map. Filter by sector, status, geographic zone, or activity level. Identify concentrations and blind spots.',
+    'feat2.title': 'High-Precision AI Detection',
+    'feat2.desc': 'Our computer vision model achieves 82–97% accuracy in detecting businesses and establishments. It reads signage, identifies sectors, and automatically geolocates every point of activity.',
+    'feat3.title': 'Trends Over Time',
+    'feat3.desc': "Compare your territory's state from one quarter to the next. Measure the impact of your policies, track formalization progress, and identify emerging sectoral trends.",
+    'feat4.title': 'Consolidated View by Economic Operator',
+    'feat4.desc': 'Aggregate establishments by owner or entity. Understand who the multi-site actors are, their economic weight, and their relationship with the administration.',
+    'feat5.title': 'Alerts and Processing Priorities',
+    'feat5.desc': 'Automatically identify new detections, inconsistencies with your existing registries, or situations requiring action from your teams. Prioritize effortlessly.',
+    'feat6.title': 'Export, API & Institutional Reports',
+    'feat6.desc': 'Export data to Excel, PDF, or via API to your existing systems. Generate structured reports for your governance bodies, oversight authorities, or international partners.',
+    'impact.badge': 'Measurable Impact',
+    'impact.h2': 'Concrete results, from year one',
+    'impact.sub': 'Whether the goal is knowing your territory better, optimizing tax collection, or informing public policy, Origin delivers measurable results quickly.',
+    'ic1.num': '×3 to ×5',
+    'ic1.title': 'Economic Registry Coverage',
+    'ic1.desc': 'Number of establishments known to the administration after Origin deployment, compared to the initial state',
+    'ic2.num': '×4.5',
+    'ic2.title': 'Census Speed',
+    'ic2.desc': 'AI detection covers in one day what a field team accomplishes in a week, at one-third the cost',
+    'ic3.title': 'Local Tax Revenue',
+    'ic3.desc': "Average increase observed in the first year in territories that activate Origin's tax module",
+    'ic4.num': '<8 wks.',
+    'ic4.title': 'Deployment Timeline',
+    'ic4.desc': 'From contract signing to the first actionable data on your territory',
+    'quote.text': '"The real economic activity of our municipalities exists largely outside any registry. This is not a fraud problem — it\'s a visibility problem. Origin finally allows us to see what is happening in our territory and respond in a structured, documented way."',
+    'cite.name': 'Head of Local Finance',
+    'cite.role': 'Territorial Administration',
+    'ctx.chip1': 'Municipalities & Cities',
+    'ctx.chip2': 'Regions & Metro Areas',
+    'ctx.chip3': 'Finance Ministries',
+    'ctx.chip4': 'Tax Authorities',
+    'ctx.chip5': 'Development Finance Institutions',
+    'cta.badge': 'Get in Touch',
+    'cta.h2': 'Whatever your starting point,<br/>let\'s begin with your territory',
+    'cta.p': "In 45 minutes, we'll show you concretely what Origin can map on your territory and how the platform adapts to your current institutional situation.",
+    'cta.d1': 'Personalized demo',
+    'cta.d2': 'Your situation analyzed',
+    'cta.d3': 'Deployable in under 8 weeks',
+    'cta.d4': 'Multilingual support',
+    'footer.copy': '© 2026 Origin · The Sov Cie. All rights reserved.',
+  }
+};
+
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  document.title = T[lang]['meta.title'];
+  document.querySelector('meta[name="description"]').setAttribute('content', T[lang]['meta.description']);
+
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const v = T[lang][el.dataset.t];
+    if (v !== undefined) el.textContent = v;
+  });
+
+  document.querySelectorAll('[data-th]').forEach(el => {
+    const v = T[lang][el.dataset.th];
+    if (v !== undefined) el.innerHTML = v;
+  });
+
+  document.querySelectorAll('[data-alt]').forEach(el => {
+    const v = T[lang][el.dataset.alt];
+    if (v !== undefined) el.alt = v;
+  });
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  try { localStorage.setItem('origin-lang', lang); } catch(e) {}
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+let initLang = 'fr';
+try { initLang = localStorage.getItem('origin-lang') || 'fr'; } catch(e) {}
+applyLang(initLang);
+</script>
 
 </body>
 </html>
