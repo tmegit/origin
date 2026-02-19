@@ -8,7 +8,11 @@ export async function middleware(req: NextRequest) {
     hostname === "thesovcie.com" || hostname === "www.thesovcie.com"
 
   if (isLandingDomain) {
-    return NextResponse.rewrite(new URL("/landing.html", req.url))
+    const { pathname } = req.nextUrl
+    if (pathname === "/" || pathname === "") {
+      return NextResponse.rewrite(new URL("/landing.html", req.url))
+    }
+    return NextResponse.next()
   }
 
   const res = NextResponse.next()
