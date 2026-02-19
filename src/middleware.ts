@@ -3,6 +3,14 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get("host") || ""
+  const isLandingDomain =
+    hostname === "thesovcie.com" || hostname === "www.thesovcie.com"
+
+  if (isLandingDomain) {
+    return NextResponse.rewrite(new URL("/landing.html", req.url))
+  }
+
   const res = NextResponse.next()
 
   const supabase = createServerClient(
