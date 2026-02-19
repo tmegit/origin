@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Origin · Intelligence territoriale en temps réel</title>
+  <meta name="description" content="Origin cartographie l'intégralité de l'activité économique d'un territoire par IA. Voyez, comprenez et gouvernez votre économie, pour toute administration qui décide sur son territoire." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c-bg:        #ffffff;
+      --c-surface:   #f7f8fa;
+      --c-surface2:  #eef0f4;
+      --c-border:    #dde1e9;
+      --c-accent:    #1a4db5;
+      --c-accent-lt: #2563eb;
+      --c-accent-bg: #eff4ff;
+      --c-gold:      #b45309;
+      --c-green:     #166534;
+      --c-green-bg:  #f0fdf4;
+      --c-red:       #991b1b;
+      --c-text:      #111827;
+      --c-text2:     #374151;
+      --c-muted:     #6b7280;
+      --c-light:     #9ca3af;
+      --radius:      8px;
+      --max-w:       1120px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── UTILS ─────────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--c-accent-bg); border: 1px solid rgba(26,77,181,.2);
+      color: var(--c-accent); font-size: .7rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 4px;
+    }
+    .badge::before { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--c-accent); }
+
+    /* ─── NAV ────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--c-border);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    nav .inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-size: 1.1rem; letter-spacing: -.01em;
+      color: var(--c-text); text-decoration: none;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .nav-logo .logo-icon { flex-shrink: 0; fill: var(--c-text); }
+    .nav-logo .logo-sov { font-weight: 400; color: var(--c-text); }
+    .nav-logo .logo-origin { font-weight: 700; color: var(--c-text); }
+    .nav-logo .logo-dot { color: var(--c-accent); font-weight: 700; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-size: .8rem; font-weight: 500; color: var(--c-muted);
+      text-decoration: none; transition: color .15s; letter-spacing: .01em;
+    }
+    .nav-links a:hover { color: var(--c-text); }
+    .nav-cta {
+      background: var(--c-accent); color: #fff;
+      padding: 8px 18px; border-radius: 5px;
+      font-size: .8rem; font-weight: 600; text-decoration: none;
+      transition: background .15s; letter-spacing: .01em;
+    }
+    .nav-cta:hover { background: #1243a0; }
+    .nav-mobile-cta { display: none; }
+
+    /* ─── HERO ───────────────────────────────────── */
+    #hero {
+      min-height: 92vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 0 72px;
+      border-bottom: 1px solid var(--c-border);
+      background: var(--c-bg);
+    }
+    .hero-content { text-align: center; }
+    .hero-eyebrow { margin-bottom: 28px; }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 700; line-height: 1.15; letter-spacing: -.02em;
+      color: var(--c-text);
+      margin-bottom: 20px;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--c-accent);
+    }
+    .hero-sub {
+      font-size: clamp(.95rem, 2vw, 1.1rem); color: var(--c-muted);
+      max-width: 600px; margin: 0 auto 36px; font-weight: 400; line-height: 1.75;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--c-accent); color: #fff;
+      padding: 12px 24px; border-radius: 5px;
+      font-size: .9rem; font-weight: 600; text-decoration: none;
+      transition: background .15s;
+    }
+    .btn-primary:hover { background: #1243a0; }
+    .btn-ghost {
+      background: transparent; color: var(--c-text2);
+      padding: 12px 24px; border-radius: 5px;
+      font-size: .9rem; font-weight: 500; text-decoration: none;
+      border: 1px solid var(--c-border); transition: border-color .15s, color .15s;
+    }
+    .btn-ghost:hover { border-color: var(--c-accent); color: var(--c-accent); }
+
+    /* Stats bar */
+    .hero-stats {
+      display: flex; gap: 0; justify-content: center;
+      margin-top: 64px; border: 1px solid var(--c-border);
+      border-radius: var(--radius); overflow: hidden;
+      max-width: 820px; margin-left: auto; margin-right: auto;
+    }
+    .stat-item {
+      flex: 1; padding: 28px 24px; text-align: center;
+      border-right: 1px solid var(--c-border);
+      background: var(--c-surface);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-size: 1.9rem; font-weight: 700; letter-spacing: -.02em;
+      color: var(--c-text); display: block;
+    }
+    .stat-num.gold { color: var(--c-gold); }
+    .stat-num.green { color: #15803d; }
+    .stat-num.blue { color: var(--c-accent); }
+    .stat-label { font-size: .78rem; color: var(--c-muted); margin-top: 6px; line-height: 1.5; }
+
+    /* ─── SECTIONS ───────────────────────────────── */
+    section { padding: 88px 0; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header .badge { margin-bottom: 18px; }
+    h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700; letter-spacing: -.02em; line-height: 1.2;
+      color: var(--c-text);
+      margin-bottom: 14px;
+    }
+    .section-sub { font-size: 1rem; color: var(--c-muted); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+    /* ─── SCREENSHOT ─────────────────────────────── */
+    #screenshot {
+      padding: 72px 0;
+      background: var(--c-bg);
+      border-bottom: 1px solid var(--c-border);
+    }
+    .screenshot-label {
+      text-align: center; font-size: .72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted);
+      margin-bottom: 20px;
+    }
+    .screenshot-frame {
+      border: 1px solid var(--c-border); border-radius: 10px;
+      overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,.06);
+    }
+    .screenshot-topbar {
+      background: var(--c-surface2); border-bottom: 1px solid var(--c-border);
+      padding: 10px 16px; display: flex; align-items: center; gap: 7px;
+    }
+    .screenshot-frame img {
+      display: block; width: 100%; height: auto;
+    }
+    .screenshot-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--c-surface);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      color: var(--c-light); font-size: .85rem;
+      border-top: 1px solid var(--c-border);
+    }
+    .screenshot-placeholder svg { opacity: .3; }
+
+    /* ─── VIDEO ───────────────────────────────────── */
+    .how-video {
+      margin-top: 56px;
+    }
+    .how-video-label {
+      text-align: center; font-size: .72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted);
+      margin-bottom: 20px;
+    }
+    .how-video-frame {
+      border: 1px solid var(--c-border); border-radius: 10px;
+      overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,.06);
+    }
+    .how-video-topbar {
+      background: var(--c-surface2); border-bottom: 1px solid var(--c-border);
+      padding: 10px 16px; display: flex; align-items: center; gap: 7px;
+    }
+    .how-video-frame video {
+      display: block; width: 100%; height: auto;
+    }
+    .how-video-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: #0c1420;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      color: rgba(255,255,255,.35); font-size: .85rem;
+    }
+    .how-video-placeholder .play-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: rgba(255,255,255,.3);
+    }
+
+    /* ─── PROBLEM ────────────────────────────────── */
+    #problem { background: var(--c-surface); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .problem-visual {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 28px; position: relative;
+    }
+    .pv-title { font-size: .7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--c-muted); margin-bottom: 20px; }
+    .pv-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .pv-bar-label { font-size: .8rem; color: var(--c-text2); width: 90px; flex-shrink: 0; }
+    .pv-bar-track { flex: 1; height: 7px; background: var(--c-surface2); border-radius: 3px; overflow: hidden; }
+    .pv-bar-fill { height: 100%; border-radius: 3px; }
+    .pv-bar-val { font-size: .8rem; font-weight: 600; color: var(--c-muted); width: 36px; text-align: right; flex-shrink: 0; }
+    .pv-callout {
+      margin-top: 20px; padding: 14px 16px; border-radius: 6px;
+      background: #fefce8; border: 1px solid #fde047;
+    }
+    .pv-callout p { font-size: .82rem; color: #854d0e; font-weight: 500; }
+
+    .problem-points { display: flex; flex-direction: column; gap: 16px; }
+    .problem-point {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 24px; border-radius: var(--radius);
+      background: var(--c-bg); border: 1px solid var(--c-border);
+    }
+    .pp-icon {
+      width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .pp-icon.red { background: #fef2f2; }
+    .pp-icon.amber { background: #fffbeb; }
+    .pp-icon.purple { background: #f5f3ff; }
+    .pp-title { font-weight: 600; font-size: .9rem; margin-bottom: 4px; color: var(--c-text); }
+    .pp-desc { font-size: .83rem; color: var(--c-muted); line-height: 1.6; }
+
+    /* ─── SOLUTION ───────────────────────────────── */
+    .solution-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .sol-card {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color .2s;
+    }
+    .sol-card:hover { border-color: var(--c-accent); }
+    .sol-number {
+      font-size: .7rem; font-weight: 700; color: var(--c-accent);
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 14px; display: block;
+    }
+    .sol-icon { font-size: 1.6rem; margin-bottom: 12px; display: block; }
+    .sol-title { font-size: .95rem; font-weight: 600; margin-bottom: 8px; color: var(--c-text); }
+    .sol-desc { font-size: .83rem; color: var(--c-muted); line-height: 1.7; }
+    .sol-tag {
+      display: inline-block; margin-top: 14px;
+      font-size: .68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--c-muted);
+    }
+
+    /* ─── HOW IT WORKS ───────────────────────────── */
+    #how { background: var(--c-surface); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+    .steps::before {
+      content: '';
+      position: absolute; top: 28px; left: 12.5%; right: 12.5%;
+      height: 1px;
+      background: var(--c-border);
+    }
+    .step { padding: 0 16px; text-align: center; }
+    .step-dot {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--c-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin: 0 auto 18px; position: relative; z-index: 1;
+      border: 3px solid var(--c-bg);
+      box-shadow: 0 0 0 1px var(--c-border);
+    }
+    .step-title { font-weight: 600; font-size: .88rem; margin-bottom: 8px; color: var(--c-text); }
+    .step-desc { font-size: .79rem; color: var(--c-muted); line-height: 1.65; }
+
+    /* ─── FEATURES ───────────────────────────────── */
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .feat-card {
+      display: flex; gap: 18px; align-items: flex-start;
+      background: var(--c-surface); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 24px;
+      transition: border-color .15s;
+    }
+    .feat-card:hover { border-color: var(--c-accent); }
+    .feat-icon {
+      width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+      background: var(--c-accent-bg); border: 1px solid rgba(26,77,181,.15);
+    }
+    .feat-title { font-weight: 600; font-size: .9rem; margin-bottom: 5px; color: var(--c-text); }
+    .feat-desc { font-size: .82rem; color: var(--c-muted); line-height: 1.65; }
+
+    /* ─── IMPACT ─────────────────────────────────── */
+    #impact { background: var(--c-surface); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
+    .impact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; align-items: start; }
+    .impact-cards { display: flex; flex-direction: column; gap: 12px; }
+    .impact-card {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 20px 24px;
+    }
+    .impact-card.highlight {
+      border-color: #bbf7d0;
+      background: var(--c-green-bg);
+    }
+    .impact-num {
+      font-size: 1.8rem; font-weight: 700; letter-spacing: -.02em;
+      color: var(--c-accent); display: block; margin-bottom: 6px;
+    }
+    .impact-card.highlight .impact-num { color: #15803d; }
+    .impact-label { font-size: .83rem; color: var(--c-muted); line-height: 1.55; }
+    .impact-label strong { display: block; color: var(--c-text); font-weight: 600; font-size: .88rem; margin-bottom: 2px; }
+
+    .impact-quote {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 36px;
+      border-left: 3px solid var(--c-accent);
+    }
+    .impact-quote blockquote {
+      font-size: 1rem; line-height: 1.85; color: var(--c-text2);
+      font-weight: 400; font-style: italic; margin-bottom: 20px;
+    }
+    .impact-quote cite {
+      display: flex; flex-direction: column; font-style: normal;
+    }
+    .cite-name { font-weight: 600; font-size: .85rem; color: var(--c-text); }
+    .cite-role { font-size: .78rem; color: var(--c-muted); margin-top: 2px; }
+    .quote-context {
+      margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--c-border);
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .ctx-chip {
+      font-size: .72rem; font-weight: 500; padding: 4px 10px;
+      border-radius: 4px; background: var(--c-accent-bg);
+      border: 1px solid rgba(26,77,181,.2); color: var(--c-accent);
+    }
+
+    /* ─── DASHBOARD PREVIEW ──────────────────────── */
+    .dashboard-preview {
+      margin-top: 56px; border: 1px solid var(--c-border);
+      border-radius: var(--radius); overflow: hidden;
+      background: var(--c-surface);
+    }
+    .dp-topbar {
+      background: var(--c-surface2); border-bottom: 1px solid var(--c-border);
+      padding: 10px 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .dp-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dp-inner { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .kpi-card {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: 6px; padding: 18px;
+    }
+    .kpi-label { font-size: .68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .09em; color: var(--c-muted); margin-bottom: 8px; }
+    .kpi-val { font-size: 1.35rem; font-weight: 700; letter-spacing: -.01em; color: var(--c-text); }
+    .kpi-sub { font-size: .7rem; color: var(--c-muted); margin-top: 4px; }
+    .kpi-green { color: #15803d; }
+    .kpi-amber { color: var(--c-gold); }
+    .kpi-blue { color: var(--c-accent); }
+    .kpi-red { color: #b91c1c; }
+
+    /* ─── FOR WHO ─────────────────────────────────── */
+    .forwho-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .forwho-card {
+      background: var(--c-bg); border: 1px solid var(--c-border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color .15s;
+    }
+    .forwho-card:hover { border-color: var(--c-accent); }
+    .fw-emoji { font-size: 2rem; margin-bottom: 14px; display: block; }
+    .fw-title { font-size: .95rem; font-weight: 600; margin-bottom: 8px; color: var(--c-text); }
+    .fw-desc { font-size: .82rem; color: var(--c-muted); line-height: 1.65; margin-bottom: 18px; }
+    .fw-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .fw-list li {
+      font-size: .79rem; color: var(--c-text2); padding-left: 16px; position: relative;
+    }
+    .fw-list li::before { content: '–'; position: absolute; left: 0; color: var(--c-accent); }
+
+    /* ─── CTA ────────────────────────────────────── */
+    #cta { padding: 88px 0; background: var(--c-surface); border-top: 1px solid var(--c-border); }
+    .cta-box {
+      background: var(--c-bg);
+      border: 1px solid var(--c-border);
+      border-top: 3px solid var(--c-accent);
+      border-radius: var(--radius); padding: 64px 48px; text-align: center;
+    }
+    .cta-box h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); margin-bottom: 14px; }
+    .cta-box p { font-size: 1rem; color: var(--c-muted); max-width: 480px; margin: 0 auto 36px; line-height: 1.75; }
+    .cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-detail {
+      margin-top: 28px; font-size: .78rem; color: var(--c-muted); display: flex;
+      gap: 20px; justify-content: center; flex-wrap: wrap;
+    }
+    .cta-detail span { display: flex; align-items: center; gap: 5px; }
+    .cta-detail span::before { content: '✓'; color: #15803d; font-weight: 700; }
+
+    /* ─── FOOTER ─────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--c-border); padding: 28px 0;
+      background: var(--c-surface);
+      text-align: center; color: var(--c-muted); font-size: .78rem;
+    }
+    footer .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    footer a { color: var(--c-muted); text-decoration: none; }
+    footer a:hover { color: var(--c-text); }
+
+    /* ─── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 900px) {
+      .problem-grid,
+      .impact-grid { grid-template-columns: 1fr; gap: 32px; }
+      .solution-grid,
+      .forwho-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .steps::before { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .dp-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .nav-mobile-cta {
+        display: inline-block; background: var(--c-accent); color: #fff;
+        padding: 6px 14px; border-radius: 5px; font-size: .78rem; font-weight: 600;
+        text-decoration: none;
+      }
+      .solution-grid,
+      .forwho-grid,
+      .steps { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--c-border); }
+      .stat-item:last-child { border-bottom: none; }
+      .cta-box { padding: 40px 20px; }
+      .dp-inner { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─────────────────────────────────── -->
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="#hero">
+      <svg class="logo-icon" width="30" height="30" viewBox="0 0 1133.9 1133.9" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M560.9,114.4c-636.2-9-636.2,937,0,927.9,632.6,9.6,632.6-937.6,0-927.9ZM250.8,403.7c20.7,287.4,508.1,167.5,508.1,368.4,8.6,168.7-335.5,149-443.2,63.6-113.4-95.9-142.2-301.3-64.9-432ZM875.3,740c-26.9-276.6-507.6-160.9-507.6-360.4-9.4-156.2,292.8-162.3,414.8-76.6,125,88.9,166.8,297.3,92.9,437Z"/>
+      </svg>
+      <span class="logo-sov">The Sov </span><span class="logo-origin">Origin<span class="logo-dot">.</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problem">Le défi</a></li>
+      <li><a href="#solution">La plateforme</a></li>
+      <li><a href="#profiles">Votre situation</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#cta">Contact</a></li>
+    </ul>
+    <a class="nav-cta" href="#cta">Demander une démo</a>
+    <a class="nav-mobile-cta" href="#cta">Démo</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ───────────────────────────────────────── -->
+<section id="hero">
+  <div class="container hero-content">
+    <div class="hero-eyebrow">
+      <span class="badge">Intelligence territoriale</span>
+    </div>
+    <h1>Voyez, comprenez et gouvernez<br/><em>votre économie en temps réel</em></h1>
+    <p class="hero-sub">
+      Origin cartographie l'intégralité de l'activité économique d'un territoire par IA. Une donnée de terrain fiable, continue et exploitable, pour toute administration qui décide sur son économie.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#cta">Demander une démonstration</a>
+      <a class="btn-ghost" href="#solution">Découvrir la plateforme →</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num gold">30–70%</span>
+        <div class="stat-label">de l'activité économique réelle absente des registres officiels dans la plupart des pays</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num green">×4,5</span>
+        <div class="stat-label">plus rapide que le recensement manuel, à une fraction du coût</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num blue">90%</span>
+        <div class="stat-label">de précision de détection et géolocalisation des établissements par IA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SCREENSHOT DASHBOARD ──────────────────────── -->
+<section id="screenshot">
+  <div class="container">
+    <div class="screenshot-label">Le tableau de bord Origin</div>
+    <div class="screenshot-frame">
+      <div class="screenshot-topbar">
+        <div class="dp-dot" style="background:#fca5a5;"></div>
+        <div class="dp-dot" style="background:#fcd34d;"></div>
+        <div class="dp-dot" style="background:#6ee7b7;"></div>
+        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Intelligence territoriale</span>
+      </div>
+      <img src="/dashboard-screenshot.png" alt="Tableau de bord Origin"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <div class="screenshot-placeholder" style="display:none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>Déposer <code>dashboard-screenshot.png</code> dans <code>/public/</code></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LE DÉFI ────────────────────────────────────── -->
+<section id="problem">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Le défi universel</span>
+      <h2>On ne gouverne pas ce qu'on ne voit pas</h2>
+      <p class="section-sub">Quel que soit le niveau de maturité de votre administration, la question de fond est identique : disposez-vous d'une image fidèle et à jour de l'activité économique sur votre territoire ?</p>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-visual">
+        <div class="pv-title">Part de l'activité économique visible par les administrations (estimations)</div>
+        <div class="pv-bar-row">
+          <div class="pv-bar-label">Commerce</div>
+          <div class="pv-bar-track"><div class="pv-bar-fill" style="width:24%; background:#ef4444;"></div></div>
+          <div class="pv-bar-val">24%</div>
+        </div>
+        <div class="pv-bar-row">
+          <div class="pv-bar-label">Restauration</div>
+          <div class="pv-bar-track"><div class="pv-bar-fill" style="width:18%; background:#ef4444;"></div></div>
+          <div class="pv-bar-val">18%</div>
+        </div>
+        <div class="pv-bar-row">
+          <div class="pv-bar-label">Artisanat</div>
+          <div class="pv-bar-track"><div class="pv-bar-fill" style="width:14%; background:#ef4444;"></div></div>
+          <div class="pv-bar-val">14%</div>
+        </div>
+        <div class="pv-bar-row">
+          <div class="pv-bar-label">Transport</div>
+          <div class="pv-bar-track"><div class="pv-bar-fill" style="width:31%; background:#f59e0b;"></div></div>
+          <div class="pv-bar-val">31%</div>
+        </div>
+        <div class="pv-bar-row">
+          <div class="pv-bar-label">Services</div>
+          <div class="pv-bar-track"><div class="pv-bar-fill" style="width:38%; background:#f59e0b;"></div></div>
+          <div class="pv-bar-val">38%</div>
+        </div>
+        <div class="pv-callout">
+          <p>⚠ En moyenne, moins d'un établissement sur trois est connu de l'administration dans les pays à économie mixte ou en développement.</p>
+        </div>
+      </div>
+
+      <div class="problem-points">
+        <div class="problem-point">
+          <div class="pp-icon red">🔍</div>
+          <div>
+            <div class="pp-title">Une activité économique largement invisible</div>
+            <div class="pp-desc">Des milliers d'établissements (boutiques, ateliers, prestataires de services) opèrent sans avoir jamais été recensés. Ils n'existent dans aucune base de données publique.</div>
+          </div>
+        </div>
+        <div class="problem-point">
+          <div class="pp-icon amber">📋</div>
+          <div>
+            <div class="pp-title">Des registres figés dans le temps</div>
+            <div class="pp-desc">Les recensements manuels sont ponctuels, coûteux et rapidement obsolètes. L'image que votre administration a de son territoire peut avoir plusieurs années de retard.</div>
+          </div>
+        </div>
+        <div class="problem-point">
+          <div class="pp-icon purple">🏛️</div>
+          <div>
+            <div class="pp-title">Des décisions sans données fiables</div>
+            <div class="pp-desc">Politique économique, fiscalité, urbanisme, planification des services publics : chaque décision prise sans cartographie précise repose sur des hypothèses, pas sur des faits.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LA PLATEFORME ──────────────────────────────── -->
+<section id="solution">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">La plateforme</span>
+      <h2>De la rue à la décision : un cycle continu</h2>
+      <p class="section-sub">Origin transforme les données de terrain en intelligence territoriale exploitable. La fiscalité est l'une des applications possibles ; la visibilité économique est le fondement.</p>
+    </div>
+
+    <div class="solution-grid">
+      <div class="sol-card">
+        <div class="sol-number">Couche 01</div>
+        <span class="sol-icon">📷</span>
+        <div class="sol-title">Détection terrain par IA embarquée</div>
+        <div class="sol-desc">Un véhicule équipé d'une caméra parcourt le territoire. Notre modèle de vision identifie et géolocalise automatiquement chaque établissement (enseignes, secteur, type d'activité) à 90% de précision.</div>
+        <span class="sol-tag">Vision par ordinateur · OCR · Géocodage</span>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">Couche 02</div>
+        <span class="sol-icon">🗺️</span>
+        <div class="sol-title">Registre territorial en temps réel</div>
+        <div class="sol-desc">Chaque établissement détecté est versé dans un registre structuré avec ses coordonnées GPS, son secteur d'activité, son statut et son historique. Une base de données vivante, mise à jour en continu.</div>
+        <span class="sol-tag">Base de données · Cartographie · Enrichissement</span>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">Couche 03</div>
+        <span class="sol-icon">👤</span>
+        <div class="sol-title">Identification des opérateurs économiques</div>
+        <div class="sol-desc">Associez chaque établissement à son responsable. Consolidez les profils multi-sites. Constituez un annuaire des acteurs économiques de votre territoire, utilisable pour n'importe quelle politique publique.</div>
+        <span class="sol-tag">KYC · Consolidation · Suivi des acteurs</span>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">Couche 04</div>
+        <span class="sol-icon">📊</span>
+        <div class="sol-title">Tableau de bord décisionnel</div>
+        <div class="sol-desc">Une vue synthétique et géographique de l'activité économique de votre territoire : densité sectorielle, évolution dans le temps, zones d'activité, indicateurs personnalisables selon vos priorités.</div>
+        <span class="sol-tag">Analytics · Cartographie · Reporting</span>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">Couche 05</div>
+        <span class="sol-icon">⚙️</span>
+        <div class="sol-title">Module de gestion fiscale (optionnel)</div>
+        <div class="sol-desc">Pour les administrations qui souhaitent aller jusqu'à la collecte : affectation d'obligations, pilotage des agents terrain, suivi des paiements et des retards, recouvrement structuré.</div>
+        <span class="sol-tag">Collecte · Agents · Recouvrement</span>
+      </div>
+      <div class="sol-card">
+        <div class="sol-number">Couche 06</div>
+        <span class="sol-icon">🔗</span>
+        <div class="sol-title">Intégration avec vos systèmes existants</div>
+        <div class="sol-desc">Origin s'intègre via API avec votre système fiscal, votre ERP ou vos outils métier actuels. Il enrichit et complète l'existant, sans le remplacer.</div>
+        <span class="sol-tag">API REST · Interopérabilité · Personnalisation</span>
+      </div>
+    </div>
+
+    <!-- Dashboard preview -->
+    <div class="dashboard-preview">
+      <div class="dp-topbar">
+        <div class="dp-dot" style="background:#fca5a5;"></div>
+        <div class="dp-dot" style="background:#fcd34d;"></div>
+        <div class="dp-dot" style="background:#6ee7b7;"></div>
+        <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Intelligence territoriale · Vue d'ensemble</span>
+      </div>
+      <div class="dp-inner">
+        <div class="kpi-card">
+          <div class="kpi-label">Établissements cartographiés</div>
+          <div class="kpi-val kpi-blue">12 438</div>
+          <div class="kpi-sub">↑ +847 ce trimestre</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Taux de couverture du territoire</div>
+          <div class="kpi-val kpi-green">74%</div>
+          <div class="kpi-sub">↑ +18 pts vs. an dernier</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Secteurs d'activité identifiés</div>
+          <div class="kpi-val kpi-blue">34</div>
+          <div class="kpi-sub">Classification automatique NAF</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Nouveaux acteurs non enregistrés</div>
+          <div class="kpi-val kpi-amber">3 201</div>
+          <div class="kpi-sub">Détectés, en attente de traitement</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMMENT ÇA MARCHE ──────────────────────────── -->
+<section id="how">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Comment ça marche</span>
+      <h2>De la collecte terrain à la décision publique</h2>
+      <p class="section-sub">Un processus continu, automatisé et non-invasif. Votre administration reste en contrôle à chaque étape.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">📷</div>
+        <div class="step-title">1. Collecte terrain</div>
+        <div class="step-desc">Un véhicule caméra parcourt le territoire. L'IA analyse les images en temps réel et détecte chaque point d'activité économique : boutiques, ateliers, prestataires, marchés.</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⚙️</div>
+        <div class="step-title">2. Traitement & structuration</div>
+        <div class="step-desc">Les données sont automatiquement géocodées, classées par secteur et croisées avec vos registres existants pour identifier ce qui est connu, ce qui est nouveau, ce qui a changé.</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">🗺️</div>
+        <div class="step-title">3. Mise à jour du registre</div>
+        <div class="step-desc">Votre registre territorial est enrichi en continu. Vos équipes valident, complètent et prennent des décisions à partir d'une base de données toujours à jour.</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">🏛️</div>
+        <div class="step-title">4. Action & gouvernance</div>
+        <div class="step-desc">Politique fiscale, urbanisme, services publics, planification économique : chaque décision s'appuie sur une image fidèle du territoire. Les résultats sont mesurés en temps réel.</div>
+      </div>
+    </div>
+    <!-- Vidéo détection computer vision -->
+    <div class="how-video">
+      <div class="how-video-label">Détection en temps réel par vision par ordinateur</div>
+      <div class="how-video-frame">
+        <div class="how-video-topbar">
+          <div class="dp-dot" style="background:#fca5a5;"></div>
+          <div class="dp-dot" style="background:#fcd34d;"></div>
+          <div class="dp-dot" style="background:#6ee7b7;"></div>
+          <span style="font-size:.72rem; color:var(--c-muted); margin-left:10px; font-weight:500;">Origin · Détection terrain · Vision par ordinateur</span>
+        </div>
+        <video autoplay muted loop playsinline controls preload="auto"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <source src="/detection-video.mp4" type="video/mp4" />
+          <source src="/detection-video.webm" type="video/webm" />
+        </video>
+        <div class="how-video-placeholder" style="display:none;">
+          <div class="play-icon">▶</div>
+          <span>Déposer <code style="color:rgba(255,255,255,.5)">detection-video.mp4</code> dans <code style="color:rgba(255,255,255,.5)">/public/</code></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VOTRE SITUATION ────────────────────────────── -->
+<section id="profiles">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Votre situation</span>
+      <h2>Origin s'adapte à votre point de départ</h2>
+      <p class="section-sub">Chaque pays a son propre niveau de maturité institutionnelle. Origin fonctionne dans tous les cas, en apportant exactement ce qui manque.</p>
+    </div>
+    <div class="forwho-grid">
+      <div class="forwho-card">
+        <span class="fw-emoji">🌱</span>
+        <div class="fw-title">Vous n'avez ni détection, ni registre structuré</div>
+        <div class="fw-desc">Votre territoire dispose de peu de données économiques formalisées. Origin vous permet de partir de zéro et de construire une base solide pour toute politique publique.</div>
+        <ul class="fw-list">
+          <li>Cartographie initiale complète du territoire</li>
+          <li>Constitution d'un registre économique de référence</li>
+          <li>Identification des acteurs économiques clés</li>
+          <li>Tableau de bord pour les décideurs</li>
+          <li>Module fiscal activable selon vos priorités</li>
+        </ul>
+      </div>
+      <div class="forwho-card">
+        <span class="fw-emoji">🔧</span>
+        <div class="fw-title">Vous avez un système fiscal, mais pas de détection terrain</div>
+        <div class="fw-desc">Vos outils de gestion fiscale existent, mais vos registres sont incomplets. Des acteurs économiques opèrent en dehors de votre radar, et vous le savez. Origin comble ce manque.</div>
+        <ul class="fw-list">
+          <li>Détection des acteurs absents de votre registre</li>
+          <li>Enrichissement et mise à jour de vos données existantes</li>
+          <li>Intégration via API avec vos systèmes actuels</li>
+          <li>Aucune remise en cause de votre infrastructure</li>
+          <li>Conformité et compliance simplifiées</li>
+        </ul>
+      </div>
+      <div class="forwho-card">
+        <span class="fw-emoji">🌐</span>
+        <div class="fw-title">Vous pilotez à l'échelle nationale ou régionale</div>
+        <div class="fw-desc">Ministères, directions fiscales, bailleurs de fonds, organisations internationales : vous avez besoin d'une vision consolidée, comparative et fiable de l'activité économique à grande échelle.</div>
+        <ul class="fw-list">
+          <li>Tableau de bord agrégé multi-territoires</li>
+          <li>Indicateurs comparatifs entre régions ou communes</li>
+          <li>Données structurées pour la réforme fiscale</li>
+          <li>Reporting pour les partenaires institutionnels</li>
+          <li>Suivi des programmes de formalisation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FONCTIONNALITÉS ────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Fonctionnalités clés</span>
+      <h2>Tout ce dont votre administration a besoin</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🛰️</div>
+        <div>
+          <div class="feat-title">Cartographie interactive du territoire</div>
+          <div class="feat-desc">Visualisez l'intégralité des établissements économiques sur une carte dynamique. Filtrez par secteur, statut, zone géographique ou niveau d'activité. Identifiez les concentrations et les angles morts.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔎</div>
+        <div>
+          <div class="feat-title">Détection IA à haute précision</div>
+          <div class="feat-desc">Notre modèle de vision par ordinateur atteint 82–97% de précision sur la détection de commerces et établissements. Il lit les enseignes, identifie les secteurs et géolocalise automatiquement chaque point d'activité.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📈</div>
+        <div>
+          <div class="feat-title">Évolution dans le temps</div>
+          <div class="feat-desc">Comparez l'état de votre territoire d'un trimestre à l'autre. Mesurez l'impact de vos politiques, suivez l'évolution de la formalisation et identifiez les tendances sectorielles émergentes.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏢</div>
+        <div>
+          <div class="feat-title">Vue consolidée par opérateur économique</div>
+          <div class="feat-desc">Agrégez les établissements par responsable ou entité. Comprenez qui sont les acteurs multi-sites, leur poids économique et leur situation vis-à-vis de l'administration.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚠️</div>
+        <div>
+          <div class="feat-title">Alertes et priorités de traitement</div>
+          <div class="feat-desc">Identifiez automatiquement les nouvelles détections, les incohérences avec vos registres existants ou les situations nécessitant une action de vos équipes. Priorisez sans effort.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📥</div>
+        <div>
+          <div class="feat-title">Export, API & rapports institutionnels</div>
+          <div class="feat-desc">Exportez vos données vers Excel, PDF ou via API vers vos systèmes existants. Générez des rapports structurés pour vos instances de gouvernance, tutelles ou partenaires internationaux.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── IMPACT ─────────────────────────────────────── -->
+<section id="impact">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Impact mesurable</span>
+      <h2>Des résultats concrets, dès la première année</h2>
+      <p class="section-sub">Qu'il s'agisse de mieux connaître votre territoire, d'optimiser votre collecte fiscale ou d'éclairer vos politiques publiques, Origin produit des effets mesurables rapidement.</p>
+    </div>
+    <div class="impact-grid">
+      <div class="impact-cards">
+        <div class="impact-card highlight">
+          <div class="impact-num">×3 à ×5</div>
+          <div class="impact-label">
+            <strong>Couverture du registre économique</strong>
+            Nombre d'établissements connus de l'administration après déploiement d'Origin, par rapport à l'état initial
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">×4,5</div>
+          <div class="impact-label">
+            <strong>Vitesse de recensement</strong>
+            La détection IA couvre en une journée ce qu'une équipe terrain accomplit en une semaine, pour un coût divisé par 3
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">+40%</div>
+          <div class="impact-label">
+            <strong>Recettes fiscales locales</strong>
+            Augmentation moyenne observée dès la première année dans les territoires activant le module fiscal d'Origin
+          </div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">&lt;8 sem.</div>
+          <div class="impact-label">
+            <strong>Délai de déploiement</strong>
+            De la signature du contrat aux premières données exploitables sur votre territoire
+          </div>
+        </div>
+      </div>
+      <div class="impact-quote">
+        <blockquote>
+          "L'activité économique réelle de nos communes existe largement en dehors de tout registre. Ce n'est pas un problème de fraude, c'est un problème de visibilité. Origin nous permet enfin de voir ce qui se passe sur notre territoire, et d'y répondre de manière structurée et documentée."
+        </blockquote>
+        <cite>
+          <span class="cite-name">Responsable des Finances locales</span>
+          <span class="cite-role">Administration territoriale</span>
+        </cite>
+        <div class="quote-context">
+          <span class="ctx-chip">Mairies & communes</span>
+          <span class="ctx-chip">Régions & agglomérations</span>
+          <span class="ctx-chip">Ministères des Finances</span>
+          <span class="ctx-chip">Directions fiscales</span>
+          <span class="ctx-chip">Bailleurs de fonds</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ────────────────────────────────────────── -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-box">
+      <span class="badge" style="margin-bottom:24px;">Premiers contacts</span>
+      <h2>Quel que soit votre point de départ,<br/>commençons par votre territoire</h2>
+      <p>En 45 minutes, nous vous montrons concrètement ce que Origin peut cartographier sur votre territoire, et comment la plateforme s'adapte à votre situation institutionnelle actuelle.</p>
+      <div style="margin: 32px auto 0; max-width: 700px;">
+        <!-- meetergo widget start -->
+        <div style="min-width:330px" class="meetergo-iframe" link="https://cal.meetergo.com/tmethesovcie/30-min-meeting-with-tristan"></div>
+        <script src="https://liv-showcase.s3.eu-central-1.amazonaws.com/browser-v3.js"></script>
+        <!-- meetergo widget end -->
+      </div>
+      <div class="cta-detail">
+        <span>Démonstration personnalisée</span>
+        <span>Analyse de votre situation incluse</span>
+        <span>Déployable en moins de 8 semaines</span>
+        <span>Support multilingue</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────── -->
+<footer>
+  <div class="container footer-inner">
+    <span>© 2026 Origin · The Sov Cie. Tous droits réservés.</span>
+    <span style="display:flex; gap:20px;">
+      <a href="mailto:contact@originsov.com">contact@originsov.com</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
