@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentions légales · Origin by The Sov Cie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c-bg:        #ffffff;
+      --c-surface:   #f7f8fa;
+      --c-border:    #dde1e9;
+      --c-accent:    #1a4db5;
+      --c-text:      #111827;
+      --c-text2:     #374151;
+      --c-muted:     #6b7280;
+      --radius:      8px;
+      --max-w:       760px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--c-border);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    nav .inner {
+      max-width: 1120px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; height: 60px;
+    }
+    .nav-logo {
+      font-size: 1.1rem; letter-spacing: -.01em;
+      color: var(--c-text); text-decoration: none;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .nav-logo .logo-sov  { font-weight: 400; }
+    .nav-logo .logo-origin { font-weight: 700; }
+    .nav-logo .logo-dot  { color: var(--c-accent); font-weight: 700; }
+    .nav-back {
+      margin-left: auto;
+      font-size: .8rem; font-weight: 500; color: var(--c-muted);
+      text-decoration: none; transition: color .15s;
+    }
+    .nav-back:hover { color: var(--c-text); }
+
+    /* ─── CONTENT ────────────────────────────────── */
+    main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+
+    h1 {
+      font-size: 2rem; font-weight: 700; letter-spacing: -.02em;
+      color: var(--c-text); margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: .9rem; color: var(--c-muted); margin-bottom: 48px;
+      padding-bottom: 24px; border-bottom: 1px solid var(--c-border);
+    }
+
+    h2 {
+      font-size: 1rem; font-weight: 600; color: var(--c-text);
+      margin: 36px 0 12px;
+      text-transform: uppercase; letter-spacing: .08em; font-size: .75rem;
+      color: var(--c-accent);
+    }
+
+    p { color: var(--c-text2); margin-bottom: 12px; font-size: .9rem; }
+    p:last-child { margin-bottom: 0; }
+
+    .info-block {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 8px;
+    }
+    .info-block p { margin-bottom: 6px; font-size: .875rem; }
+    .info-block p:last-child { margin-bottom: 0; }
+    .info-block strong { color: var(--c-text); font-weight: 600; }
+
+    a { color: var(--c-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── FOOTER ─────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--c-border);
+      padding: 24px 0;
+    }
+    .footer-inner {
+      max-width: 1120px; margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .78rem; color: var(--c-muted);
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-inner a { color: var(--c-muted); text-decoration: none; }
+    .footer-inner a:hover { color: var(--c-text); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="/" class="nav-logo">
+      <svg class="logo-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 4C10 4 6 8 6 11C6 13.2 7.8 15 10 15C12.2 15 14 13.2 14 11C14 8 10 4 10 4Z" fill="currentColor" opacity=".15"/>
+        <path d="M10 4C10 4 6 8 6 11C6 13.2 7.8 15 10 15C12.2 15 14 13.2 14 11C14 8 10 4 10 4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
+      </svg>
+      <span class="logo-sov">The Sov Cie</span><span class="logo-dot"> · </span><span class="logo-origin">Origin</span>
+    </a>
+    <a href="/" class="nav-back">← Retour au site</a>
+  </div>
+</nav>
+
+<main>
+  <h1>Mentions légales</h1>
+  <p class="subtitle">Conformément aux dispositions de la loi n° 2004-575 du 21 juin 2004 pour la confiance en l'économie numérique (LCEN).</p>
+
+  <h2>Éditeur du site</h2>
+  <div class="info-block">
+    <p><strong>Dénomination sociale</strong> : The Sov Company</p>
+    <p><strong>Forme juridique</strong> : Société par actions simplifiée unipersonnelle (SASU)</p>
+    <p><strong>Capital social</strong> : 31 250 €</p>
+    <p><strong>Siège social</strong> : 60 rue François I<sup>er</sup>, 75008 Paris, France</p>
+    <p><strong>RCS Paris</strong> : 999 541 931</p>
+    <p><strong>Directeur de la publication</strong> : Tristan Méneret</p>
+    <p><strong>Email</strong> : <a href="mailto:contact@thesovcie.com">contact@thesovcie.com</a></p>
+  </div>
+
+  <h2>Hébergement</h2>
+  <div class="info-block">
+    <p><strong>Hébergeur</strong> : Vercel Inc.</p>
+    <p><strong>Adresse</strong> : 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</p>
+    <p><strong>Site web</strong> : <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></p>
+  </div>
+
+  <h2>Propriété intellectuelle</h2>
+  <p>L'ensemble du contenu de ce site (textes, images, graphiques, logo, icônes, sons, logiciels, etc.) est la propriété exclusive de The Sov Company ou de ses partenaires. Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation écrite préalable de The Sov Company.</p>
+
+  <h2>Données personnelles</h2>
+  <p>Ce site peut collecter des données à caractère personnel dans le cadre de la prise de contact ou de la demande de démonstration. Ces données sont traitées conformément au Règlement général sur la protection des données (RGPD — Règlement UE 2016/679).</p>
+  <p>Pour toute question relative au traitement de vos données ou pour exercer vos droits (accès, rectification, suppression, opposition), vous pouvez contacter : <a href="mailto:contact@thesovcie.com">contact@thesovcie.com</a>.</p>
+
+  <h2>Cookies</h2>
+  <p>Ce site peut utiliser des cookies afin d'améliorer l'expérience utilisateur. En poursuivant votre navigation, vous acceptez leur utilisation. Vous pouvez à tout moment les désactiver via les paramètres de votre navigateur.</p>
+
+  <h2>Droit applicable</h2>
+  <p>Le présent site et ses mentions légales sont soumis au droit français. En cas de litige, les tribunaux compétents sont ceux du ressort du siège social de The Sov Company.</p>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>© 2026 Origin · The Sov Cie. Tous droits réservés.</span>
+    <span style="display:flex; gap:20px;">
+      <a href="mailto:contact@thesovcie.com">contact@thesovcie.com</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
