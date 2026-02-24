@@ -2,6 +2,8 @@
 import "./globals.css"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/Header"
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
   title: {
@@ -38,6 +40,8 @@ export default function RootLayout({
 </main>
           </div>
         </div>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
